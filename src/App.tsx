@@ -5,6 +5,21 @@ import { Session } from '@supabase/supabase-js';
 import { ChevronRight, MessageCircle, Send, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const API_BASE_URL = 'https://seculo-2.onrender.com';
+
+async function checkOnboardingStatus(userId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/dashboard/${userId}`);
+    if (response.ok) {
+      const data = await response.json();
+      return !!data.whatsapp_number;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 // --- Components ---
 
 const Landing = () => {
@@ -289,18 +304,19 @@ const AuthPage = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/onboarding.html`,
           }
         });
         if (error) throw error;
         alert('Check your email for the login link!');
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        navigate('/dashboard');
+        const hasOnboarded = await checkOnboardingStatus(data.user.id);
+        window.location.href = hasOnboarded ? '/dashboard.html' : '/onboarding.html';
       }
     } catch (err: any) {
       setError(err.message);
@@ -315,7 +331,7 @@ const AuthPage = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/onboarding.html`,
         },
       });
       if (error) throw error;
@@ -514,9 +530,14 @@ const Dashboard = ({ session }: { session: Session }) => {
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session) {
+        const hasOnboarded = await checkOnboardingStatus(session.user.id);
+        setRedirectTo(hasOnboarded ? '/dashboard.html' : '/onboarding.html');
+      }
       setSession(session);
       setLoading(false);
     });
@@ -538,16 +559,20 @@ export default function App() {
     );
   }
 
+  if (redirectTo && session) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
   return (
     <Router>
       <Routes>
         <Route 
           path="/" 
-          element={session ? <Navigate to="/dashboard" replace /> : <Landing />} 
+          element={session ? <Navigate to={redirectTo || '/dashboard.html'} replace /> : <Landing />} 
         />
         <Route 
           path="/auth" 
-          element={session ? <Navigate to="/dashboard" replace /> : <AuthPage />} 
+          element={session ? <Navigate to={redirectTo || '/dashboard.html'} replace /> : <AuthPage />} 
         />
         <Route 
           path="/dashboard" 
