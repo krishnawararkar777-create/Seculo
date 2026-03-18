@@ -312,13 +312,12 @@ const AuthPage = () => {
         if (error) throw error;
         alert('Check your email for the login link!');
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        const hasOnboarded = await checkOnboardingStatus(data.user.id);
-        window.location.href = hasOnboarded ? '/dashboard.html' : '/onboarding.html';
+        window.location.href = '/onboarding.html';
       }
     } catch (err: any) {
       setError(err.message);
@@ -535,11 +534,7 @@ export default function App() {
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        const hasOnboarded = await checkOnboardingStatus(session.user.id);
-        setRedirectTo(hasOnboarded ? '/dashboard.html' : '/onboarding.html');
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
     });
@@ -561,20 +556,16 @@ export default function App() {
     );
   }
 
-  if (redirectTo && session) {
-    return <Navigate to={redirectTo} replace />;
-  }
-
   return (
     <Router>
       <Routes>
         <Route 
           path="/" 
-          element={session ? <Navigate to={redirectTo || '/dashboard.html'} replace /> : <Landing />} 
+          element={session ? <Navigate to="/onboarding.html" replace /> : <Landing />} 
         />
         <Route 
           path="/auth" 
-          element={session ? <Navigate to={redirectTo || '/dashboard.html'} replace /> : <AuthPage />} 
+          element={session ? <Navigate to="/onboarding.html" replace /> : <AuthPage />} 
         />
         <Route 
           path="/dashboard" 

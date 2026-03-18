@@ -109,11 +109,34 @@
 
     let user = null;
 
+    async function checkOnboardingStatus(userId) {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('whatsapp_number')
+          .eq('id', userId)
+          .single();
+        
+        if (error || !data || !data.whatsapp_number) {
+          return false;
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
         window.location.href = '/auth';
+        return;
+      }
+      
+      const hasOnboarded = await checkOnboardingStatus(session.user.id);
+      if (!hasOnboarded) {
+        window.location.href = '/onboarding.html';
         return;
       }
       
