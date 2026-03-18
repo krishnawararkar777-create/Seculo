@@ -150,7 +150,7 @@
 
     async function getDashboardData() {
       try {
-        const response = await fetch(`https://seculo-2.onrender.com/dashboard/${user.id}`);
+        const response = await fetch(`https://seculo-2.onrender.com/api/dashboard/${user.id}`);
         const data = await response.json();
         
         if (response.ok) {
@@ -182,7 +182,7 @@
 
     window.startBot = async function() {
       showMessage('Starting bot...', 'info');
-      const response = await fetch('https://seculo-2.onrender.com/bot/start', {
+      const response = await fetch('https://seculo-2.onrender.com/api/bot/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id })
@@ -198,7 +198,7 @@
 
     window.stopBot = async function() {
       showMessage('Stopping bot...', 'info');
-      const response = await fetch('https://seculo-2.onrender.com/bot/stop', {
+      const response = await fetch('https://seculo-2.onrender.com/api/bot/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id })
@@ -214,13 +214,13 @@
 
     window.restartBot = async function() {
       showMessage('Restarting bot...', 'info');
-      await fetch('https://seculo-2.onrender.com/bot/stop', {
+      await fetch('https://seculo-2.onrender.com/api/bot/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id })
       });
       setTimeout(async () => {
-        const response = await fetch('https://seculo-2.onrender.com/bot/start', {
+        const response = await fetch('https://seculo-2.onrender.com/api/bot/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: user.id })
@@ -237,7 +237,7 @@
     window.deleteBot = async function() {
       if (!confirm('Are you sure you want to delete your bot? This cannot be undone.')) return;
       showMessage('Deleting bot...', 'info');
-      const response = await fetch('https://seculo-2.onrender.com/bot/delete', {
+      const response = await fetch('https://seculo-2.onrender.com/api/bot/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id })

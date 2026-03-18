@@ -13,16 +13,24 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-app.get('/health', (req, res) => {
+app.use('/api', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.post('/onboard', onboard);
-app.post('/bot/create', createBot);
-app.post('/bot/stop', stopBotRoute);
-app.post('/bot/start', startBotRoute);
-app.post('/bot/delete', deleteBotRoute);
-app.get('/dashboard/:user_id', getDashboard);
+app.post('/api/onboard', onboard);
+app.post('/api/bot/create', createBot);
+app.post('/api/bot/stop', stopBotRoute);
+app.post('/api/bot/start', startBotRoute);
+app.post('/api/bot/delete', deleteBotRoute);
+app.get('/api/dashboard/:user_id', getDashboard);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

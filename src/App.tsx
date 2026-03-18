@@ -5,7 +5,7 @@ import { Session } from '@supabase/supabase-js';
 import { ChevronRight, MessageCircle, Send, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const API_BASE_URL = 'https://seculo-2.onrender.com';
+const API_BASE_URL = 'https://seculo-2.onrender.com/api';
 
 async function checkOnboardingStatus(userId: string): Promise<boolean> {
   try {
