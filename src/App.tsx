@@ -9,12 +9,14 @@ const API_BASE_URL = 'https://seculo-2.onrender.com';
 
 async function checkOnboardingStatus(userId: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/dashboard/${userId}`);
-    if (response.ok) {
-      const data = await response.json();
-      return !!data.whatsapp_number;
-    }
-    return false;
+    const { data, error } = await supabase
+      .from('users')
+      .select('whatsapp_number')
+      .eq('id', userId)
+      .single();
+    
+    if (error || !data) return false;
+    return !!data.whatsapp_number;
   } catch {
     return false;
   }

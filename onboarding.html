@@ -3,221 +3,298 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Onboarding - Seculo</title>
+  <title>Get Started - Seculo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
     .font-serif { font-family: 'Playfair Display', serif; }
-    .step-circle { transition: all 0.3s ease; }
-    .step-circle.active { background: #155dfd; border-color: #155dfd; }
-    .step-circle.completed { background: #22c55e; border-color: #22c55e; }
-    .plan-card { transition: all 0.3s ease; }
-    .plan-card:hover { transform: translateY(-4px); }
-    .plan-card.selected { border-color: #155dfd; background: rgba(21, 93, 253, 0.1); }
-    .gradient-border {
-      background: linear-gradient(135deg, #155dfd 0%, #6366f1 100%);
-      padding: 2px;
-      border-radius: 1rem;
-    }
     .btn-primary {
-      background: linear-gradient(135deg, #155dfd 0%, #6366f1 100%);
-      transition: all 0.3s ease;
+      background: #155dfd;
+      transition: all 0.2s;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(21, 93, 253, 0.3); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-primary:hover { background: #104bc2; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     .fade-in { animation: fadeIn 0.5s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .step-dot { transition: all 0.3s ease; }
+    .step-dot.active { background: #155dfd; transform: scale(1.2); }
+    .step-dot.completed { background: #22c55e; }
+    .step-dot.inactive { background: #374151; }
+    .plan-card { transition: all 0.2s; }
+    .plan-card:hover { border-color: rgba(255,255,255,0.2); }
+    .plan-card.selected { border-color: #155dfd; background: rgba(21, 93, 253, 0.1); }
+    .input-field {
+      background: #1A1A1A;
+      transition: all 0.2s;
+    }
+    .input-field:focus { border-color: #155dfd; outline: none; box-shadow: 0 0 0 2px rgba(21, 93, 253, 0.2); }
   </style>
 </head>
-<body class="min-h-screen bg-[#0A0A0A] text-white">
-  <nav class="w-full bg-[#0A0A0A] border-b border-white/10">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center">
-      <span class="text-xl font-bold font-serif text-white tracking-tight">Seculo</span>
+<body class="min-h-screen bg-[#0A0A0A] text-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="flex justify-center">
+      <span class="text-3xl font-bold font-serif text-white tracking-tight">Seculo</span>
     </div>
-  </nav>
+    <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-white">
+      Setup Your Assistant
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-400">
+      Complete 3 steps to deploy your AI bot
+    </p>
+  </div>
 
-  <main class="max-w-2xl mx-auto px-6 py-12">
-    <div class="text-center mb-12">
-      <h1 class="text-4xl font-serif text-white mb-3">Setup Your Assistant</h1>
-      <p class="text-gray-400">Complete these steps to deploy your AI bot</p>
-    </div>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-[#111111] py-8 px-4 shadow sm:rounded-xl sm:px-10 border border-white/10">
+      <div class="flex items-center justify-center gap-4 mb-8">
+        <div class="flex flex-col items-center gap-2">
+          <div id="dot1" class="step-dot w-3 h-3 rounded-full active"></div>
+          <span class="text-xs text-gray-400">WhatsApp</span>
+        </div>
+        <div class="w-8 h-px bg-gray-700"></div>
+        <div class="flex flex-col items-center gap-2">
+          <div id="dot2" class="step-dot w-3 h-3 rounded-full inactive"></div>
+          <span class="text-xs text-gray-400">API Key</span>
+        </div>
+        <div class="w-8 h-px bg-gray-700"></div>
+        <div class="flex flex-col items-center gap-2">
+          <div id="dot3" class="step-dot w-3 h-3 rounded-full inactive"></div>
+          <span class="text-xs text-gray-400">Plan</span>
+        </div>
+      </div>
 
-    <div class="flex items-center justify-center gap-4 mb-12">
-      <div class="flex items-center gap-2">
-        <div id="step1-circle" class="step-circle w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-bold active">1</div>
-        <span class="text-sm text-gray-400 hidden sm:block">WhatsApp</span>
-      </div>
-      <div class="w-12 h-px bg-gray-700"></div>
-      <div class="flex items-center gap-2">
-        <div id="step2-circle" class="step-circle w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-bold">2</div>
-        <span class="text-sm text-gray-400 hidden sm:block">API Key</span>
-      </div>
-      <div class="w-12 h-px bg-gray-700"></div>
-      <div class="flex items-center gap-2">
-        <div id="step3-circle" class="step-circle w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center text-sm font-bold">3</div>
-        <span class="text-sm text-gray-400 hidden sm:block">Plan</span>
-      </div>
-    </div>
-
-    <div class="bg-[#111111] rounded-2xl border border-white/10 p-8 shadow-xl">
-      <form id="onboarding-form">
-        <div id="step1" class="fade-in">
-          <h2 class="text-2xl font-bold text-white mb-6">Enter your WhatsApp number</h2>
-          <p class="text-gray-400 mb-6">This will be used to identify your account and connect to your bot.</p>
-          <div class="relative">
-            <input type="tel" id="whatsapp_number" placeholder="+1234567890" required
-              class="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-500 focus:border-[#155dfd] focus:ring-1 focus:ring-[#155dfd] outline-none transition-all">
+      <form id="onboarding-form" class="space-y-6">
+        <div id="step1">
+          <div>
+            <label for="whatsapp" class="block text-sm font-medium text-gray-300">
+              WhatsApp Number
+            </label>
+            <p class="text-xs text-gray-500 mb-2">Include country code (e.g., +1, +91)</p>
+            <input
+              id="whatsapp_number"
+              type="tel"
+              required
+              placeholder="+1234567890"
+              class="input-field mt-1 block w-full appearance-none rounded-md border border-white/10 px-3 py-2 text-white placeholder-gray-500 sm:text-sm"
+            >
+            <p id="whatsapp-error" class="hidden mt-1 text-xs text-red-400">Please enter a valid number with country code (e.g., +1 or +91)</p>
           </div>
-          <div class="flex justify-end mt-6">
-            <button type="button" onclick="nextStep(2)" class="btn-primary px-8 py-3 rounded-xl font-semibold text-white">Continue</button>
+          <div class="mt-6">
+            <button
+              type="button"
+              onclick="goToStep(2)"
+              class="btn-primary flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#155dfd] focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+            >
+              Continue
+            </button>
           </div>
         </div>
 
         <div id="step2" class="hidden">
-          <h2 class="text-2xl font-bold text-white mb-2">Connect Gemini API</h2>
-          <p class="text-gray-400 mb-6">Get your free API key from Google AI Studio to power your assistant.</p>
-          <a href="https://aistudio.google.com" target="_blank" class="inline-flex items-center gap-2 text-[#155dfd] hover:underline mb-6 text-sm">
-            Get free API key at aistudio.google.com
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-          </a>
-          <input type="text" id="gemini_api_key" placeholder="AIza..." required
-            class="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-4 text-white placeholder-gray-500 focus:border-[#155dfd] focus:ring-1 focus:ring-[#155dfd] outline-none transition-all font-mono text-sm">
-          <div class="flex justify-between mt-6">
-            <button type="button" onclick="prevStep(1)" class="px-6 py-3 border border-white/10 rounded-xl font-semibold text-gray-400 hover:bg-white/5 transition-all">Back</button>
-            <button type="button" onclick="nextStep(3)" class="btn-primary px-8 py-3 rounded-xl font-semibold text-white">Continue</button>
+          <div>
+            <label for="api_key" class="block text-sm font-medium text-gray-300">
+              Gemini API Key
+            </label>
+            <p class="text-xs text-gray-500 mb-2">Get your free key from Google AI Studio</p>
+            <a 
+              href="https://aistudio.google.com" 
+              target="_blank" 
+              class="inline-flex items-center gap-1 text-[#155dfd] hover:underline mb-3 text-xs"
+            >
+              Get API key at aistudio.google.com
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+            <input
+              id="gemini_api_key"
+              type="text"
+              required
+              placeholder="AIza..."
+              class="input-field mt-1 block w-full appearance-none rounded-md border border-white/10 px-3 py-2 text-white placeholder-gray-500 sm:text-sm font-mono"
+            >
+            <p id="api-error" class="hidden mt-1 text-xs text-red-400">API key must start with "AIza"</p>
+          </div>
+          <div class="mt-6 flex gap-3">
+            <button
+              type="button"
+              onclick="goToStep(1)"
+              class="flex w-1/3 justify-center rounded-md border border-white/10 py-2 px-4 text-sm font-medium text-gray-400 hover:bg-white/5 transition-all"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              onclick="goToStep(3)"
+              class="btn-primary flex w-2/3 justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#155dfd] focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+            >
+              Continue
+            </button>
           </div>
         </div>
 
         <div id="step3" class="hidden">
-          <h2 class="text-2xl font-bold text-white mb-6">Choose your plan</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div onclick="selectPlan('basic')" id="plan-basic" class="plan-card bg-[#1A1A1A] border border-white/10 rounded-xl p-6 cursor-pointer">
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-lg font-bold text-white">Basic</span>
-                <span class="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">Popular</span>
+          <label class="block text-sm font-medium text-gray-300 mb-4">
+            Choose Your Plan
+          </label>
+          <div class="space-y-3">
+            <div
+              id="plan-basic"
+              onclick="selectPlan('basic')"
+              class="plan-card bg-[#1A1A1A] border border-white/10 rounded-xl p-4 cursor-pointer"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <input type="radio" name="plan" value="basic" class="hidden" checked>
+                  <div id="radio-basic" class="w-4 h-4 rounded-full border-2 border-[#155dfd] flex items-center justify-center">
+                    <div class="w-2 h-2 rounded-full bg-[#155dfd]"></div>
+                  </div>
+                  <span class="text-sm font-medium text-white">Basic</span>
+                </div>
+                <span class="text-lg font-bold text-white">$9<span class="text-sm font-normal text-gray-400">/mo</span></span>
               </div>
-              <div class="flex items-baseline gap-1 mb-4">
-                <span class="text-4xl font-bold text-white">$9</span>
-                <span class="text-gray-400">/month</span>
-              </div>
-              <ul class="space-y-2 text-sm text-gray-400">
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 WhatsApp Bot</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Gemini API</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Basic Support</li>
-              </ul>
+              <p class="mt-2 text-xs text-gray-500 ml-7">1 WhatsApp Bot, Gemini API, Basic Support</p>
             </div>
-            <div onclick="selectPlan('pro')" id="plan-pro" class="plan-card bg-[#1A1A1A] border border-white/10 rounded-xl p-6 cursor-pointer">
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-lg font-bold text-white">Pro</span>
-                <span class="px-3 py-1 bg-[#155dfd]/20 text-[#155dfd] text-xs font-semibold rounded-full">Best Value</span>
+            <div
+              id="plan-pro"
+              onclick="selectPlan('pro')"
+              class="plan-card bg-[#1A1A1A] border border-white/10 rounded-xl p-4 cursor-pointer"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <input type="radio" name="plan" value="pro" class="hidden">
+                  <div id="radio-pro" class="w-4 h-4 rounded-full border-2 border-gray-600 flex items-center justify-center"></div>
+                  <span class="text-sm font-medium text-white">Pro</span>
+                  <span class="px-2 py-0.5 bg-[#155dfd]/20 text-[#155dfd] text-xs font-medium rounded-full">Best Value</span>
+                </div>
+                <span class="text-lg font-bold text-white">$19<span class="text-sm font-normal text-gray-400">/mo</span></span>
               </div>
-              <div class="flex items-baseline gap-1 mb-4">
-                <span class="text-4xl font-bold text-white">$19</span>
-                <span class="text-gray-400">/month</span>
-              </div>
-              <ul class="space-y-2 text-sm text-gray-400">
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited Bots</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L4L19 7"></path></svg> Advanced Features</li>
-              </ul>
+              <p class="mt-2 text-xs text-gray-500 ml-7">Unlimited Bots, Priority Support, Advanced Features</p>
             </div>
           </div>
-          <input type="hidden" id="plan" value="basic">
-          <div id="error-message" class="hidden bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl mb-4 text-sm"></div>
-          <div class="flex justify-between">
-            <button type="button" onclick="prevStep(2)" class="px-6 py-3 border border-white/10 rounded-xl font-semibold text-gray-400 hover:bg-white/5 transition-all">Back</button>
-            <button type="submit" id="submit-btn" class="btn-primary px-8 py-3 rounded-xl font-semibold text-white">Confirm & Deploy</button>
+
+          <div id="submit-error" class="hidden mt-4 bg-red-500/10 border border-red-500/50 text-red-400 text-sm p-3 rounded-md">
+          </div>
+
+          <div class="mt-6 flex gap-3">
+            <button
+              type="button"
+              onclick="goToStep(2)"
+              class="flex w-1/3 justify-center rounded-md border border-white/10 py-2 px-4 text-sm font-medium text-gray-400 hover:bg-white/5 transition-all"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              id="submit-btn"
+              class="btn-primary flex w-2/3 justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#155dfd] focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+            >
+              Confirm & Deploy
+            </button>
           </div>
         </div>
 
-        <div id="success" class="hidden text-center py-8">
-          <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <div id="success" class="hidden text-center py-4 fade-in">
+          <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           </div>
-          <h2 class="text-3xl font-serif text-white mb-4">You're All Set!</h2>
-          <p class="text-gray-400 mb-8">Your AI assistant is being deployed. You'll be redirected to your dashboard shortly.</p>
-          <a href="/dashboard" class="btn-primary inline-block px-8 py-3 rounded-xl font-semibold text-white">Go to Dashboard</a>
+          <h3 class="text-xl font-bold text-white mb-2">You are all set!</h3>
+          <p class="text-sm text-gray-400 mb-6">Your AI assistant is ready. Let's get started!</p>
+          <a
+            href="/dashboard.html"
+            class="btn-primary inline-block w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm"
+          >
+            Go to Dashboard
+          </a>
         </div>
       </form>
     </div>
-  </main>
+  </div>
 
-  <script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabaseUrl = 'https://lzkllxdyyoaclcfvlzfl.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6a2xseGR5eW9hY2xjZnZsemZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NTA0MDUsImV4cCI6MjA4OTMyNjQwNX0.Crmt3w2vIdWCLHtjNsOCmyvj_9zNmVCbFyJ7m6i2VV0';
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
     let currentStep = 1;
     let selectedPlan = 'basic';
 
-    function updateStepCircles() {
-      for (let i = 1; i <= 3; i++) {
-        const circle = document.getElementById(`step${i}-circle`);
-        circle.classList.remove('active', 'completed');
-        if (i < currentStep) {
-          circle.classList.add('completed');
-          circle.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-        } else if (i === currentStep) {
-          circle.classList.add('active');
-          circle.textContent = i;
-        } else {
-          circle.textContent = i;
-        }
-      }
-    }
+    window.goToStep = function(step) {
+      const whatsappInput = document.getElementById('whatsapp_number');
+      const apiKeyInput = document.getElementById('gemini_api_key');
+      const whatsappError = document.getElementById('whatsapp-error');
+      const apiError = document.getElementById('api-error');
 
-    function showStep(step) {
-      document.querySelectorAll('[id^="step"]').forEach(el => {
-        if (el.id.startsWith('step') && el.id !== 'onboarding-form') {
-          el.classList.add('hidden');
+      if (step === 2 && currentStep === 1) {
+        const whatsapp = whatsappInput.value.trim();
+        const isValid = /^\+?\d{1,4}?\d{6,12}$/.test(whatsapp.replace(/[\s\-()]/g, ''));
+        if (!isValid || !whatsapp.startsWith('+')) {
+          whatsappError.classList.remove('hidden');
+          whatsappInput.focus();
+          return;
         }
-      });
+        whatsappError.classList.add('hidden');
+      }
+
+      if (step === 3 && currentStep === 2) {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey.startsWith('AIza')) {
+          apiError.classList.remove('hidden');
+          apiKeyInput.focus();
+          return;
+        }
+        apiError.classList.add('hidden');
+      }
+
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.add('hidden');
       document.getElementById(`step${step}`).classList.remove('hidden');
       document.getElementById(`step${step}`).classList.add('fade-in');
+
+      document.getElementById('dot1').className = 'step-dot w-3 h-3 rounded-full ' + (step > 1 ? 'completed' : (step === 1 ? 'active' : 'inactive'));
+      document.getElementById('dot2').className = 'step-dot w-3 h-3 rounded-full ' + (step > 2 ? 'completed' : (step === 2 ? 'active' : 'inactive'));
+      document.getElementById('dot3').className = 'step-dot w-3 h-3 rounded-full ' + (step === 3 ? 'active' : 'inactive');
+
       currentStep = step;
-      updateStepCircles();
-    }
+    };
 
-    function nextStep(step) {
-      if (step === 2 && !document.getElementById('whatsapp_number').value) {
-        document.getElementById('whatsapp_number').focus();
-        return;
-      }
-      if (step === 3 && !document.getElementById('gemini_api_key').value) {
-        document.getElementById('gemini_api_key').focus();
-        return;
-      }
-      showStep(step);
-    }
-
-    function prevStep(step) {
-      showStep(step);
-    }
-
-    function selectPlan(plan) {
+    window.selectPlan = function(plan) {
       selectedPlan = plan;
-      document.getElementById('plan').value = plan;
-      document.getElementById('plan-basic').classList.remove('selected');
-      document.getElementById('plan-pro').classList.remove('selected');
-      document.getElementById(`plan-${plan}`).classList.add('selected');
-    }
+      document.querySelectorAll('input[name="plan"]').forEach(input => {
+        input.checked = input.value === plan;
+      });
+      document.getElementById('plan-basic').classList.toggle('selected', plan === 'basic');
+      document.getElementById('plan-pro').classList.toggle('selected', plan === 'pro');
+      document.getElementById('radio-basic').classList.toggle('border-[#155dfd]', plan === 'basic');
+      document.getElementById('radio-basic').innerHTML = plan === 'basic' ? '<div class="w-2 h-2 rounded-full bg-[#155dfd]"></div>' : '';
+      document.getElementById('radio-pro').classList.toggle('border-[#155dfd]', plan === 'pro');
+      document.getElementById('radio-pro').innerHTML = plan === 'pro' ? '<div class="w-2 h-2 rounded-full bg-[#155dfd]"></div>' : '';
+    };
 
     document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const errorDiv = document.getElementById('error-message');
       const submitBtn = document.getElementById('submit-btn');
+      const errorDiv = document.getElementById('submit-error');
       errorDiv.classList.add('hidden');
       submitBtn.disabled = true;
       submitBtn.textContent = 'Deploying...';
 
-      const data = {
-        whatsapp_number: document.getElementById('whatsapp_number').value,
-        gemini_api_key: document.getElementById('gemini_api_key').value,
-        plan: selectedPlan
-      };
-
       try {
-        const response = await fetch('https://seculo-2.onrender.com/onboard', {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = '/auth';
+          return;
+        }
+
+        const response = await fetch('https://seculo-2.onrender.com/api/onboard', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify({
+            whatsapp_number: document.getElementById('whatsapp_number').value,
+            gemini_api_key: document.getElementById('gemini_api_key').value,
+            plan: selectedPlan
+          })
         });
 
         const result = await response.json();
@@ -228,10 +305,6 @@
 
         document.getElementById('step3').classList.add('hidden');
         document.getElementById('success').classList.remove('hidden');
-        document.getElementById('success').classList.add('fade-in');
-        updateStepCircles();
-        document.getElementById('step3-circle').classList.add('completed');
-        document.getElementById('step3-circle').innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
       } catch (error) {
         errorDiv.textContent = error.message;
         errorDiv.classList.remove('hidden');
@@ -240,7 +313,13 @@
       }
     });
 
-    selectPlan('basic');
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/auth';
+      }
+    }
+    checkAuth();
   </script>
 </body>
 </html>
