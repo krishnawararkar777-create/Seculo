@@ -5,6 +5,7 @@ import { Session } from '@supabase/supabase-js';
 import { ChevronRight, MessageCircle, Send, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Onboarding from './pages/Onboarding';
+import Dashboard from './pages/Dashboard';
 
 // --- Components ---
 
@@ -446,70 +447,6 @@ const AuthPage = () => {
   );
 };
 
-const Dashboard = ({ session }: { session: Session }) => {
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
-  return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
-      <div className="max-w-6xl mx-auto p-6 md:p-12">
-        <header className="flex items-center justify-between mb-12 bg-[#111111] p-6 rounded-xl border border-white/10 shadow-sm">
-          <div className="flex items-center gap-4">
-            <span className="text-xl font-bold font-serif text-white tracking-tight">Seculo</span>
-            <div className="h-6 w-px bg-white/10 mx-2" />
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-white">Console</h1>
-              <p className="text-[#155dfd] text-sm font-medium">{session.user.email}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-6 py-2 bg-[#1A1A1A] border border-white/10 text-gray-300 rounded-md hover:bg-[#222222] transition-all text-sm font-bold active:scale-95"
-          >
-            Sign Out
-          </button>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-[#111111] border border-white/10 p-8 rounded-xl shadow-sm">
-            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">Account Status</h3>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-[#155dfd] rounded-full animate-pulse" />
-              <p className="text-xl font-bold">Active</p>
-            </div>
-          </div>
-          <div className="bg-[#111111] border border-white/10 p-8 rounded-xl shadow-sm">
-            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">Last Login</h3>
-            <p className="text-xl font-bold">{new Date(session.user.last_sign_in_at || '').toLocaleDateString()}</p>
-          </div>
-          <div className="bg-[#111111] border border-white/10 p-8 rounded-xl shadow-sm">
-            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">Auth Provider</h3>
-            <p className="text-xl font-bold capitalize">{session.user.app_metadata.provider}</p>
-          </div>
-        </div>
-
-        <div className="bg-[#111111] border border-white/10 rounded-xl overflow-hidden shadow-sm">
-          <div className="p-8 border-b border-white/10 flex items-center justify-between bg-[#0A0A0A]/50">
-            <h2 className="text-xl font-bold text-white">User Profile</h2>
-            <span className="px-3 py-1 bg-[#155dfd]/10 text-[#155dfd] text-[10px] font-bold uppercase tracking-widest rounded-full border border-[#155dfd]/20">
-              Authenticated
-            </span>
-          </div>
-          <div className="p-8">
-            <pre className="bg-[#0A0A0A] p-6 rounded-lg overflow-x-auto text-xs font-mono text-[#155dfd]/80 border border-white/5">
-              {JSON.stringify(session.user, null, 2)}
-            </pre>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // --- Main App ---
 
 export default function App() {
@@ -557,7 +494,7 @@ export default function App() {
         />
         <Route 
           path="/dashboard" 
-          element={session ? <Dashboard session={session} /> : <Navigate to="/login" replace />} 
+          element={session ? <Dashboard /> : <Navigate to="/login" replace />} 
         />
       </Routes>
     </Router>
