@@ -5,21 +5,26 @@ import { supabase } from '../supabaseClient';
 const API_BASE_URL = 'https://seculo-2.onrender.com/api';
 
 const countries = [
-  { code: '+91', name: 'India', flag: '🇮🇳' },
-  { code: '+1', name: 'United States', flag: '🇺🇸' },
-  { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
-  { code: '+61', name: 'Australia', flag: '🇦🇺' },
-  { code: '+1', name: 'Canada', flag: '🇨🇦' },
-  { code: '+49', name: 'Germany', flag: '🇩🇪' },
-  { code: '+33', name: 'France', flag: '🇫🇷' },
-  { code: '+81', name: 'Japan', flag: '🇯🇵' },
-  { code: '+86', name: 'China', flag: '🇨🇳' },
-  { code: '+65', name: 'Singapore', flag: '🇸🇬' },
-  { code: '+971', name: 'UAE', flag: '🇦🇪' },
-  { code: '+92', name: 'Pakistan', flag: '🇵🇰' },
-  { code: '+880', name: 'Bangladesh', flag: '🇧🇩' },
-  { code: '+62', name: 'Indonesia', flag: '🇮🇩' },
-  { code: '+60', name: 'Malaysia', flag: '🇲🇾' },
+  { code: 'IN', dial: '+91', name: 'India', flag: '🇮🇳' },
+  { code: 'US', dial: '+1', name: 'United States', flag: '🇺🇸' },
+  { code: 'GB', dial: '+44', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'AU', dial: '+61', name: 'Australia', flag: '🇦🇺' },
+  { code: 'CA', dial: '+1', name: 'Canada', flag: '🇨🇦' },
+  { code: 'DE', dial: '+49', name: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', dial: '+33', name: 'France', flag: '🇫🇷' },
+  { code: 'JP', dial: '+81', name: 'Japan', flag: '🇯🇵' },
+  { code: 'CN', dial: '+86', name: 'China', flag: '🇨🇳' },
+  { code: 'SG', dial: '+65', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'AE', dial: '+971', name: 'UAE', flag: '🇦🇪' },
+  { code: 'PK', dial: '+92', name: 'Pakistan', flag: '🇵🇰' },
+  { code: 'BD', dial: '+880', name: 'Bangladesh', flag: '🇧🇩' },
+  { code: 'ID', dial: '+62', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'MY', dial: '+60', name: 'Malaysia', flag: '🇲🇾' },
+  { code: 'BR', dial: '+55', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'MX', dial: '+52', name: 'Mexico', flag: '🇲🇽' },
+  { code: 'IT', dial: '+39', name: 'Italy', flag: '🇮🇹' },
+  { code: 'ES', dial: '+34', name: 'Spain', flag: '🇪🇸' },
+  { code: 'NL', dial: '+31', name: 'Netherlands', flag: '🇳🇱' },
 ];
 
 const chatMessages = [
@@ -78,7 +83,8 @@ export default function Onboarding() {
 
   const filteredCountries = countries.filter(c =>
     c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-    c.code.includes(countrySearch)
+    c.code.toLowerCase().includes(countrySearch.toLowerCase()) ||
+    c.dial.includes(countrySearch)
   );
 
   const handleChange = (e) => {
@@ -126,7 +132,7 @@ export default function Onboarding() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          whatsapp_number: `${selectedCountry.code}${formData.whatsapp_number}`,
+          whatsapp_number: `${selectedCountry.dial}${formData.whatsapp_number}`,
           gemini_api_key: formData.gemini_api_key,
           plan: selectedPlan,
         }),
@@ -150,7 +156,10 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white flex">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-[45%] p-6 lg:p-12 flex flex-col">
+      <div className="w-full lg:w-[45%] p-6 lg:p-12 flex flex-col relative">
+        {/* Vertical divider */}
+        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#2a2d3a] to-transparent" />
+        
         {/* Logo */}
         <div className="flex items-center gap-3 mb-12">
           <div className="w-8 h-8 bg-[#4f8ef7] rounded-lg flex items-center justify-center">
@@ -196,39 +205,42 @@ export default function Onboarding() {
               <div>
                 <label className="block text-sm text-gray-400 mb-2">WhatsApp Number</label>
                 <div className="flex gap-2">
-                  <div ref={dropdownRef} className="relative w-32">
+                  <div ref={dropdownRef} className="relative w-[120px] flex-shrink-0">
                     <button
                       type="button"
                       onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      className="w-full flex items-center gap-2 bg-[#1a1a2e] border border-white/10 rounded-xl px-3 py-3 text-sm hover:border-white/20 transition-all"
+                      className="w-full flex items-center gap-1.5 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-3 py-3 hover:border-[#4f8ef7]/50 transition-all"
                     >
-                      <span>{selectedCountry.flag}</span>
-                      <span className="text-gray-400">{selectedCountry.code}</span>
+                      <span className="text-sm">{selectedCountry.flag}</span>
+                      <span className="text-[#4f8ef7] font-mono text-sm font-medium">{selectedCountry.dial}</span>
                       <svg className="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
                     {showCountryDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a2e] border border-white/10 rounded-xl overflow-hidden shadow-xl z-50">
-                        <div className="p-2 border-b border-white/10">
+                      <div className="absolute top-full left-0 w-[280px] mt-2 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl overflow-hidden shadow-xl z-50">
+                        <div className="p-2 border-b border-[#2a2d3a]">
                           <input
                             type="text"
-                            placeholder="Search..."
+                            placeholder="Search country..."
                             value={countrySearch}
                             onChange={(e) => setCountrySearch(e.target.value)}
-                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-[#4f8ef7] outline-none"
+                            className="w-full bg-[#0f1117] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:border-[#4f8ef7] outline-none border border-[#2a2d3a]"
                           />
                         </div>
-                        <div className="max-h-48 overflow-y-auto">
+                        <div className="max-h-52 overflow-y-auto scrollbar-thin">
                           {filteredCountries.map((c, idx) => (
                             <button
                               key={idx}
                               onClick={() => selectCountry(c)}
-                              className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-white/5 text-sm"
+                              className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-[#2a2d3a] transition-colors ${
+                                selectedCountry.code === c.code ? 'bg-[#4f8ef7]/20 text-[#4f8ef7]' : ''
+                              }`}
                             >
-                              <span>{c.flag}</span>
-                              <span className="text-gray-400">{c.code}</span>
-                              <span>{c.name}</span>
+                              <span className="text-base">{c.flag}</span>
+                              <span className="text-xs text-gray-500 font-mono bg-[#2a2d3a] px-1.5 py-0.5 rounded">{c.code}</span>
+                              <span className="text-[#4f8ef7] font-mono text-sm">{c.dial}</span>
+                              <span className="text-white text-sm flex-1 text-left">{c.name}</span>
                             </button>
                           ))}
                         </div>
@@ -241,7 +253,7 @@ export default function Onboarding() {
                     value={formData.whatsapp_number}
                     onChange={handleChange}
                     placeholder="9876543210"
-                    className="flex-1 bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-[#4f8ef7] outline-none transition-all"
+                    className="flex-1 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-4 py-3 text-sm focus:border-[#4f8ef7] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -276,12 +288,12 @@ export default function Onboarding() {
                   value={formData.gemini_api_key}
                   onChange={handleChange}
                   placeholder="AIza..."
-                  className="w-full bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-3 text-sm font-mono focus:border-[#4f8ef7] outline-none transition-all"
+                  className="w-full bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-4 py-3 text-sm font-mono focus:border-[#4f8ef7] outline-none transition-all"
                 />
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <div className="flex gap-3">
-                <button onClick={prevStep} className="flex-1 py-3.5 border border-white/10 rounded-xl font-medium text-gray-400 hover:bg-white/5 transition-all">
+                <button onClick={prevStep} className="flex-1 py-3.5 border border-[#2a2d3a] rounded-xl font-medium text-gray-400 hover:bg-[#1a1a2e] transition-all">
                   Back
                 </button>
                 <button onClick={nextStep} className="flex-1 py-3.5 bg-[#4f8ef7] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all">
@@ -299,7 +311,7 @@ export default function Onboarding() {
                   <div
                     onClick={() => setSelectedPlan('basic')}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      selectedPlan === 'basic' ? 'border-[#4f8ef7] bg-[#4f8ef7]/5' : 'border-white/10 hover:border-white/20'
+                      selectedPlan === 'basic' ? 'border-[#4f8ef7] bg-[#4f8ef7]/5' : 'border-[#2a2d3a] hover:border-[#4f8ef7]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -318,7 +330,7 @@ export default function Onboarding() {
                   <div
                     onClick={() => setSelectedPlan('pro')}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      selectedPlan === 'pro' ? 'border-[#4f8ef7] bg-[#4f8ef7]/5' : 'border-white/10 hover:border-white/20'
+                      selectedPlan === 'pro' ? 'border-[#4f8ef7] bg-[#4f8ef7]/5' : 'border-[#2a2d3a] hover:border-[#4f8ef7]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -338,7 +350,7 @@ export default function Onboarding() {
               </div>
               {error && <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm">{error}</div>}
               <div className="flex gap-3">
-                <button type="button" onClick={prevStep} className="flex-1 py-3.5 border border-white/10 rounded-xl font-medium text-gray-400 hover:bg-white/5 transition-all">
+                <button type="button" onClick={prevStep} className="flex-1 py-3.5 border border-[#2a2d3a] rounded-xl font-medium text-gray-400 hover:bg-[#1a1a2e] transition-all">
                   Back
                 </button>
                 <button type="submit" disabled={loading} className="flex-1 py-3.5 bg-[#4f8ef7] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all disabled:opacity-50">
@@ -366,9 +378,9 @@ export default function Onboarding() {
       </div>
 
       {/* Right Side - WhatsApp Mockup */}
-      <div className="hidden lg:flex lg:w-[55%] bg-[#0f0f18] items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-[55%] bg-[#0a0a0f] items-center justify-center p-12">
         <div className="relative">
-          <div className="absolute inset-0 bg-green-500/10 blur-3xl rounded-full" />
+          <div className="absolute inset-0 bg-green-500/5 blur-3xl rounded-full" />
           <div className="relative">
             {/* Phone Frame */}
             <div className="w-72 bg-[#1a1a2e] rounded-[2.5rem] p-3 shadow-2xl">
@@ -424,6 +436,10 @@ export default function Onboarding() {
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: #1a1a2e; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #2a2d3a; border-radius: 3px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #3a3d4a; }
       `}</style>
     </div>
   );
