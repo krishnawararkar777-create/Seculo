@@ -290,7 +290,7 @@ const AuthPage = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/onboarding`,
+            emailRedirectTo: `${window.location.origin}/onboarding.html`,
           }
         });
         if (error) throw error;
@@ -301,7 +301,7 @@ const AuthPage = () => {
           password,
         });
         if (error) throw error;
-        window.location.href = '/onboarding';
+        window.location.href = '/onboarding.html';
       }
     } catch (err: any) {
       setError(err.message);
@@ -316,7 +316,7 @@ const AuthPage = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/onboarding`,
+          redirectTo: `${window.location.origin}/onboarding.html`,
         },
       });
       if (error) throw error;
@@ -545,11 +545,11 @@ export default function App() {
       <Routes>
         <Route 
           path="/" 
-          element={session ? <Navigate to="/onboarding" replace /> : <Landing />} 
+          element={session ? <Navigate to="/onboarding.html" replace /> : <Landing />} 
         />
         <Route 
           path="/auth" 
-          element={session ? <Navigate to="/onboarding" replace /> : <AuthPage />} 
+          element={session ? <Navigate to="/onboarding.html" replace /> : <AuthPage />} 
         />
         <Route 
           path="/onboarding" 

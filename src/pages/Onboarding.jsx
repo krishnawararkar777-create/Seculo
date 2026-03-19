@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { API_BASE_URL } from '../api';
 
@@ -276,12 +276,12 @@ export default function Onboarding() {
               </div>
               <h3 className="text-xl font-bold text-white mb-2">You are all set!</h3>
               <p className="text-sm text-gray-400 mb-6">Your AI assistant is ready. Let's get started!</p>
-              <Link
-                to="/dashboard"
+              <a
+                href="/dashboard.html"
                 className="inline-flex w-full justify-center rounded-md border border-transparent bg-[#155dfd] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#104bc2] transition-all"
               >
                 Go to Dashboard
-              </Link>
+              </a>
             </div>
           )}
         </div>
