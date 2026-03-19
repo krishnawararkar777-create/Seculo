@@ -4,8 +4,8 @@ import { supabase } from './supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { ChevronRight, MessageCircle, Send, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const API_BASE_URL = 'https://seculo-2.onrender.com/api';
+import { API_BASE_URL } from './api';
+import Onboarding from './pages/Onboarding';
 
 async function checkOnboardingStatus(userId: string): Promise<boolean> {
   try {
@@ -306,7 +306,7 @@ const AuthPage = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/onboarding.html`,
+            emailRedirectTo: `${window.location.origin}/onboarding`,
           }
         });
         if (error) throw error;
@@ -317,7 +317,7 @@ const AuthPage = () => {
           password,
         });
         if (error) throw error;
-        window.location.href = '/onboarding.html';
+        window.location.href = '/onboarding';
       }
     } catch (err: any) {
       setError(err.message);
@@ -332,7 +332,7 @@ const AuthPage = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/onboarding.html`,
+          redirectTo: `${window.location.origin}/onboarding`,
         },
       });
       if (error) throw error;
@@ -561,11 +561,15 @@ export default function App() {
       <Routes>
         <Route 
           path="/" 
-          element={session ? <Navigate to="/onboarding.html" replace /> : <Landing />} 
+          element={session ? <Navigate to="/onboarding" replace /> : <Landing />} 
         />
         <Route 
           path="/auth" 
-          element={session ? <Navigate to="/onboarding.html" replace /> : <AuthPage />} 
+          element={session ? <Navigate to="/onboarding" replace /> : <AuthPage />} 
+        />
+        <Route 
+          path="/onboarding" 
+          element={session ? <Onboarding /> : <Navigate to="/auth" replace />} 
         />
         <Route 
           path="/dashboard" 

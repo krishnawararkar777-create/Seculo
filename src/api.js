@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://seculo-2.onrender.com/api';
+export const API_BASE_URL = 'https://seculo-2.onrender.com/api';
 
 export interface OnboardData {
   whatsapp_number: string;
