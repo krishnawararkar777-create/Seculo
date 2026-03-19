@@ -162,7 +162,7 @@ export default function Onboarding() {
         
         {/* Logo */}
         <div className="flex items-center gap-3 mb-12">
-          <div className="w-8 h-8 bg-[#4f8ef7] rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#155dfd] rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -180,7 +180,7 @@ export default function Onboarding() {
             <div key={i} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
                 step === i 
-                  ? 'bg-[#4f8ef7] text-white shadow-lg shadow-[#4f8ef7]/30' 
+                  ? 'bg-[#155dfd] text-white shadow-lg shadow-[#155dfd]/30' 
                   : step > i 
                     ? 'bg-green-500 text-white' 
                     : 'border-2 border-gray-600 text-gray-500'
@@ -209,10 +209,10 @@ export default function Onboarding() {
                     <button
                       type="button"
                       onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      className="w-full flex items-center gap-1.5 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-3 py-3 hover:border-[#4f8ef7]/50 transition-all"
+                      className="w-full flex items-center gap-1.5 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-3 py-3 hover:border-[#155dfd]/50 transition-all"
                     >
                       <span className="text-sm">{selectedCountry.flag}</span>
-                      <span className="text-[#4f8ef7] font-mono text-sm font-medium">{selectedCountry.dial}</span>
+                      <span className="text-[#155dfd] font-mono text-sm font-medium">{selectedCountry.dial}</span>
                       <svg className="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -225,7 +225,7 @@ export default function Onboarding() {
                             placeholder="Search country..."
                             value={countrySearch}
                             onChange={(e) => setCountrySearch(e.target.value)}
-                            className="w-full bg-[#0f1117] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:border-[#4f8ef7] outline-none border border-[#2a2d3a]"
+                            className="w-full bg-[#0f1117] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:border-[#155dfd] outline-none border border-[#2a2d3a]"
                           />
                         </div>
                         <div className="max-h-52 overflow-y-auto scrollbar-thin">
@@ -234,12 +234,12 @@ export default function Onboarding() {
                               key={idx}
                               onClick={() => selectCountry(c)}
                               className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-[#2a2d3a] transition-colors ${
-                                selectedCountry.code === c.code ? 'bg-[#4f8ef7]/20 text-[#4f8ef7]' : ''
+                                selectedCountry.code === c.code ? 'bg-[#155dfd]/20 text-[#155dfd]' : ''
                               }`}
                             >
                               <span className="text-base">{c.flag}</span>
                               <span className="text-xs text-gray-500 font-mono bg-[#2a2d3a] px-1.5 py-0.5 rounded">{c.code}</span>
-                              <span className="text-[#4f8ef7] font-mono text-sm">{c.dial}</span>
+                              <span className="text-[#155dfd] font-mono text-sm">{c.dial}</span>
                               <span className="text-white text-sm flex-1 text-left">{c.name}</span>
                             </button>
                           ))}
@@ -253,14 +253,14 @@ export default function Onboarding() {
                     value={formData.whatsapp_number}
                     onChange={handleChange}
                     placeholder="9876543210"
-                    className="flex-1 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-4 py-3 text-sm focus:border-[#4f8ef7] outline-none transition-all"
+                    className="flex-1 bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-4 py-3 text-sm focus:border-[#155dfd] outline-none transition-all"
                   />
                 </div>
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <button
                 onClick={nextStep}
-                className="w-full py-3.5 bg-[#4f8ef7] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all"
+                className="w-full py-3.5 bg-[#155dfd] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all"
               >
                 Continue
               </button>
@@ -275,7 +275,7 @@ export default function Onboarding() {
                   href="https://aistudio.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[#4f8ef7] hover:underline text-sm mb-3"
+                  className="inline-flex items-center gap-1 text-[#155dfd] hover:underline text-sm mb-3"
                 >
                   Get free API key at Google AI Studio
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +288,7 @@ export default function Onboarding() {
                   value={formData.gemini_api_key}
                   onChange={handleChange}
                   placeholder="AIza..."
-                  className="w-full bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-4 py-3 text-sm font-mono focus:border-[#4f8ef7] outline-none transition-all"
+                  className="w-full bg-[#1a1a2e] border border-[#2a2d3a] rounded-xl px-4 py-3 text-sm font-mono focus:border-[#155dfd] outline-none transition-all"
                 />
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -296,7 +296,7 @@ export default function Onboarding() {
                 <button onClick={prevStep} className="flex-1 py-3.5 border border-[#2a2d3a] rounded-xl font-medium text-gray-400 hover:bg-[#1a1a2e] transition-all">
                   Back
                 </button>
-                <button onClick={nextStep} className="flex-1 py-3.5 bg-[#4f8ef7] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all">
+                <button onClick={nextStep} className="flex-1 py-3.5 bg-[#155dfd] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all">
                   Continue
                 </button>
               </div>
@@ -311,13 +311,13 @@ export default function Onboarding() {
                   <div
                     onClick={() => setSelectedPlan('basic')}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      selectedPlan === 'basic' ? 'border-[#4f8ef7] bg-[#4f8ef7]/5' : 'border-[#2a2d3a] hover:border-[#4f8ef7]/50'
+                      selectedPlan === 'basic' ? 'border-[#155dfd] bg-[#155dfd]/5' : 'border-[#2a2d3a] hover:border-[#155dfd]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === 'basic' ? 'border-[#4f8ef7]' : 'border-gray-500'}`}>
-                          {selectedPlan === 'basic' && <div className="w-2.5 h-2.5 rounded-full bg-[#4f8ef7]" />}
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === 'basic' ? 'border-[#155dfd]' : 'border-gray-500'}`}>
+                          {selectedPlan === 'basic' && <div className="w-2.5 h-2.5 rounded-full bg-[#155dfd]" />}
                         </div>
                         <div>
                           <span className="font-medium">Basic</span>
@@ -330,17 +330,17 @@ export default function Onboarding() {
                   <div
                     onClick={() => setSelectedPlan('pro')}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      selectedPlan === 'pro' ? 'border-[#4f8ef7] bg-[#4f8ef7]/5' : 'border-[#2a2d3a] hover:border-[#4f8ef7]/50'
+                      selectedPlan === 'pro' ? 'border-[#155dfd] bg-[#155dfd]/5' : 'border-[#2a2d3a] hover:border-[#155dfd]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === 'pro' ? 'border-[#4f8ef7]' : 'border-gray-500'}`}>
-                          {selectedPlan === 'pro' && <div className="w-2.5 h-2.5 rounded-full bg-[#4f8ef7]" />}
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === 'pro' ? 'border-[#155dfd]' : 'border-gray-500'}`}>
+                          {selectedPlan === 'pro' && <div className="w-2.5 h-2.5 rounded-full bg-[#155dfd]" />}
                         </div>
                         <div>
                           <span className="font-medium">Pro</span>
-                          <span className="ml-2 text-xs bg-[#4f8ef7]/20 text-[#4f8ef7] px-2 py-0.5 rounded-full">Best Value</span>
+                          <span className="ml-2 text-xs bg-[#155dfd]/20 text-[#155dfd] px-2 py-0.5 rounded-full">Best Value</span>
                         </div>
                       </div>
                       <span className="text-xl font-bold">$19<span className="text-sm font-normal text-gray-400">/mo</span></span>
@@ -353,7 +353,7 @@ export default function Onboarding() {
                 <button type="button" onClick={prevStep} className="flex-1 py-3.5 border border-[#2a2d3a] rounded-xl font-medium text-gray-400 hover:bg-[#1a1a2e] transition-all">
                   Back
                 </button>
-                <button type="submit" disabled={loading} className="flex-1 py-3.5 bg-[#4f8ef7] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all disabled:opacity-50">
+                <button type="submit" disabled={loading} className="flex-1 py-3.5 bg-[#155dfd] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all disabled:opacity-50">
                   {loading ? 'Deploying...' : 'Deploy Now'}
                 </button>
               </div>
@@ -369,7 +369,7 @@ export default function Onboarding() {
               </div>
               <h2 className="text-2xl font-bold mb-2">You're All Set!</h2>
               <p className="text-gray-400 mb-6">Your AI assistant is ready to go</p>
-              <a href="/dashboard" className="inline-block w-full py-3.5 bg-[#4f8ef7] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all">
+              <a href="/dashboard" className="inline-block w-full py-3.5 bg-[#155dfd] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all">
                 Go to Dashboard
               </a>
             </div>
