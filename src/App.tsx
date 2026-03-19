@@ -4,23 +4,7 @@ import { supabase } from './supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { ChevronRight, MessageCircle, Send, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { API_BASE_URL } from './api';
 import Onboarding from './pages/Onboarding';
-
-async function checkOnboardingStatus(userId: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('whatsapp_number')
-      .eq('id', userId)
-      .single();
-    
-    if (error || !data) return false;
-    return !!data.whatsapp_number;
-  } catch {
-    return false;
-  }
-}
 
 // --- Components ---
 
