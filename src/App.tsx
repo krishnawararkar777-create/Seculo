@@ -12,7 +12,7 @@ const Landing = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate('/auth');
+    navigate('/login');
   };
 
   const useCasesRow1 = [
@@ -545,19 +545,19 @@ export default function App() {
       <Routes>
         <Route 
           path="/" 
-          element={session ? <Navigate to="/onboarding" replace /> : <Landing />} 
+          element={<Landing />} 
         />
         <Route 
-          path="/auth" 
-          element={session ? <Navigate to="/onboarding" replace /> : <AuthPage />} 
+          path="/login" 
+          element={<AuthPage />} 
         />
         <Route 
           path="/onboarding" 
-          element={session ? <Onboarding /> : <Navigate to="/auth" replace />} 
+          element={session ? <Onboarding /> : <Navigate to="/login" replace />} 
         />
         <Route 
           path="/dashboard" 
-          element={session ? <Dashboard session={session} /> : <Navigate to="/auth" replace />} 
+          element={session ? <Dashboard session={session} /> : <Navigate to="/login" replace />} 
         />
       </Routes>
     </Router>
