@@ -89,7 +89,7 @@
           <h2 class="text-xl font-bold text-white">Quick Actions</h2>
         </div>
         <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a href="/onboarding.html" class="px-6 py-4 bg-[#1A1A1A] border border-white/10 text-gray-300 rounded-xl font-semibold hover:bg-[#222222] transition-all text-center">
+          <a href="/onboarding" class="px-6 py-4 bg-[#1A1A1A] border border-white/10 text-gray-300 rounded-xl font-semibold hover:bg-[#222222] transition-all text-center">
             Edit Settings
           </a>
           <button onclick="getDashboardData()" class="px-6 py-4 bg-[#1A1A1A] border border-white/10 text-gray-300 rounded-xl font-semibold hover:bg-[#222222] transition-all">
@@ -136,7 +136,7 @@
       
       const hasOnboarded = await checkOnboardingStatus(session.user.id);
       if (!hasOnboarded) {
-        window.location.href = '/onboarding.html';
+        window.location.href = '/onboarding';
         return;
       }
       
