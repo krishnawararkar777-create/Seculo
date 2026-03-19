@@ -75,16 +75,16 @@ export default function Dashboard() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         .glass-card {
-          background: rgba(13, 17, 23, 0.7);
-          border: 1px solid rgba(33, 38, 45, 0.8);
-          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.08), 0 0 40px rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.1);
           transition: all 0.3s ease;
         }
         .glass-card:hover {
-          box-shadow: 0 0 20px rgba(56, 139, 253, 0.15), 0 0 40px rgba(56, 139, 253, 0.05);
-          border-color: rgba(56, 139, 253, 0.3);
+          box-shadow: 0 0 30px rgba(255, 255, 255, 0.12), 0 0 60px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
       `}</style>
 
@@ -188,34 +188,37 @@ export default function Dashboard() {
           </div>
 
           {/* Stats - Direct on dark bg with dividers */}
-          <div className="flex items-stretch mb-8">
-            <div className="flex-1 px-6 py-2 flex flex-col justify-center border-r border-[#21262d]">
-              <p className="text-[12px] font-medium text-[#8b949e] uppercase mb-1">Bot Status</p>
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${userData?.bot_status === 'running' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
-                <span className="text-[24px] font-bold text-[#e6edf3]">
-                  {userData?.bot_status === 'running' ? 'LIVE' : 'OFFLINE'}
-                </span>
+          <div className="mb-6">
+            <div className="flex items-stretch">
+              <div className="flex-1 px-6 py-3 flex flex-col justify-center border-r border-[#21262d]">
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-1">Bot Status</p>
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${userData?.bot_status === 'running' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
+                  <span className="text-[24px] font-bold text-[#ffffff]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
+                    {userData?.bot_status === 'running' ? 'LIVE' : 'OFFLINE'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex-1 px-6 py-3 flex flex-col justify-center border-r border-[#21262d]">
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-1">Messages Today</p>
+                <p className="text-[24px] font-bold text-[#ffffff]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{messages}</p>
+              </div>
+              <div className="flex-1 px-6 py-3 flex flex-col justify-center border-r border-[#21262d]">
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-1">Plan</p>
+                <p className="text-[24px] font-bold text-[#ffffff] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.plan || 'Basic'}</p>
+              </div>
+              <div className="flex-1 px-6 py-3 flex flex-col justify-center">
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-1">WhatsApp</p>
+                <p className="text-[24px] font-bold text-[#ffffff]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.whatsapp_number || '—'}</p>
               </div>
             </div>
-            <div className="flex-1 px-6 py-2 flex flex-col justify-center border-r border-[#21262d]">
-              <p className="text-[12px] font-medium text-[#8b949e] uppercase mb-1">Messages Today</p>
-              <p className="text-[24px] font-bold text-[#e6edf3]">{messages}</p>
-            </div>
-            <div className="flex-1 px-6 py-2 flex flex-col justify-center border-r border-[#21262d]">
-              <p className="text-[12px] font-medium text-[#8b949e] uppercase mb-1">Plan</p>
-              <p className="text-[24px] font-bold text-[#e6edf3] capitalize">{userData?.plan || 'Basic'}</p>
-            </div>
-            <div className="flex-1 px-6 py-2 flex flex-col justify-center">
-              <p className="text-[12px] font-medium text-[#8b949e] uppercase mb-1">WhatsApp</p>
-              <p className="text-[24px] font-bold text-[#e6edf3]">{userData?.whatsapp_number || '—'}</p>
-            </div>
+            <div className="border-b border-[#21262d] mt-2"></div>
           </div>
 
           {/* Bot Status Section - Direct on dark bg */}
-          <div className="mb-8">
+          <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[16px] font-semibold text-[#e6edf3]">Bot Status</h2>
+              <h2 className="text-[16px] font-semibold text-[#ffffff]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Bot Status</h2>
               <span className="text-[14px] text-[#8b949e]">Uptime: <span className="text-[#e6edf3] font-medium">{uptime}%</span></span>
             </div>
             <div className="flex items-center gap-2 mb-4">
@@ -232,11 +235,12 @@ export default function Dashboard() {
                 Stop Bot
               </button>
             </div>
+            <div className="border-b border-[#21262d] mt-6"></div>
           </div>
 
           {/* Recent Activity - Glassmorphism */}
           <div className="mb-8">
-            <h2 className="text-[16px] font-semibold text-[#e6edf3] mb-4">Recent Activity</h2>
+            <h2 className="text-[16px] font-semibold text-[#ffffff] mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Recent Activity</h2>
             <div className="glass-card">
               <div>
                 {recentActivity.map((activity, idx) => (
@@ -261,7 +265,7 @@ export default function Dashboard() {
           {/* WhatsApp - Glassmorphism */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[16px] font-semibold text-[#e6edf3]">WhatsApp Connection</h2>
+              <h2 className="text-[16px] font-semibold text-[#ffffff]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>WhatsApp Connection</h2>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#3fb950] rounded-full" />
                 <span className="text-[14px] text-[#3fb950]">Connected</span>
@@ -282,7 +286,7 @@ export default function Dashboard() {
           {/* API Settings - Glassmorphism */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[16px] font-semibold text-[#e6edf3]">API Settings</h2>
+              <h2 className="text-[16px] font-semibold text-[#ffffff]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>API Settings</h2>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#3fb950] rounded-full" />
                 <span className="text-[14px] text-[#3fb950]">Active</span>
@@ -303,7 +307,7 @@ export default function Dashboard() {
 
           {/* Billing - Glassmorphism */}
           <div className="mb-8">
-            <h2 className="text-[16px] font-semibold text-[#e6edf3] mb-4">Billing</h2>
+            <h2 className="text-[16px] font-semibold text-[#ffffff] mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Billing</h2>
             <div className="glass-card">
               <div className="grid grid-cols-3 gap-6">
                 <div>
