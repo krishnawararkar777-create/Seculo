@@ -139,7 +139,7 @@ export default function Onboarding() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Failed to onboard');
-      setStep(4);
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -358,21 +358,6 @@ export default function Onboarding() {
                 </button>
               </div>
             </form>
-          )}
-
-          {step === 4 && (
-            <div className="text-center py-8 animate-fadeIn">
-              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold mb-2">You're All Set!</h2>
-              <p className="text-gray-400 mb-6">Your AI assistant is ready to go</p>
-              <a href="/dashboard" className="inline-block w-full py-3.5 bg-[#155dfd] rounded-xl font-medium text-white hover:bg-[#3d7de0] transition-all">
-                Go to Dashboard
-              </a>
-            </div>
           )}
         </div>
       </div>
