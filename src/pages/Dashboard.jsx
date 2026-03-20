@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Home, HelpCircle, LogOut, RefreshCw, Power, RotateCcw, Search } from 'lucide-react';
+import { Home, HelpCircle, LogOut, Power, RotateCcw, Search, Eye, EyeOff } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
@@ -11,18 +11,27 @@ const bottomMenuItems = [
   { id: 'support', label: 'Support', icon: HelpCircle },
 ];
 
+const mockRequests = [
+  { id: 1, request: 'Hello, how are you?', response: 'I am doing great, thank you!', time: '2 min ago' },
+  { id: 2, request: 'What is AI?', response: 'Artificial Intelligence is...', time: '15 min ago' },
+  { id: 3, request: 'Help me code', response: 'I can help you with...', time: '1 hour ago' },
+];
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [userData, setUserData] = useState(null);
+  const [requests, setRequests] = useState([]);
+  const [showPhone, setShowPhone] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
 
   useEffect(() => {
-    fetchUser();
+    fetchUserData();
   }, []);
 
-  const fetchUser = async () => {
+  const fetchUserData = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -41,6 +50,7 @@ export default function Dashboard() {
         console.error('Error fetching user data:', error);
       } else {
         setUserData(userData);
+        setRequests(mockRequests);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -52,6 +62,38 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/');
+  };
+
+  const getPlanDisplay = () => {
+    if (!userData?.plan) return 'No Plan';
+    return userData.plan.charAt(0).toUpperCase() + userData.plan.slice(1);
+  };
+
+  const getPlanPrice = () => {
+    if (userData?.plan === 'pro') return '$19';
+    if (userData?.plan === 'basic') return '$9';
+    return '$0';
+  };
+
+  const getNextBilling = () => {
+    if (!userData?.created_at) return 'Not available';
+    const date = new Date(userData.created_at);
+    date.setDate(date.getDate() + 30);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const maskPhone = (phone) => {
+    if (!phone) return 'Not Set';
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length <= 4) return phone;
+    const last4 = digits.slice(-4);
+    return `XXXX ${last4}`;
+  };
+
+  const maskApiKey = (key) => {
+    if (!key) return '••••••••••••••••';
+    if (key.length <= 8) return '••••••••';
+    return key.slice(0, 8) + '••••••••••••••••';
   };
 
   if (loading) {
@@ -68,9 +110,7 @@ export default function Dashboard() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
       `}</style>
 
-      {/* Sidebar */}
       <aside className="w-[200px] bg-[#000000] border-r border-[#1e1e2e] flex flex-col fixed h-full">
-        {/* Logo */}
         <div className="p-4 border-b border-[#1e1e2e]">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 bg-[#388bfd] rounded flex items-center justify-center">
@@ -82,7 +122,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex-1 p-3">
           <ul className="space-y-0.5">
             {menuItems.map((item) => {
@@ -107,7 +146,6 @@ export default function Dashboard() {
           </ul>
         </div>
 
-        {/* Bottom Section */}
         <div className="p-3 border-t border-[#1e1e2e]">
           <ul className="space-y-0.5">
             {bottomMenuItems.map((item) => {
@@ -139,9 +177,7 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 ml-[200px] flex flex-col min-h-screen">
-        {/* Top Search Bar */}
         <div className="h-10 bg-[#000000] border-b border-[#1e1e2e] flex items-center px-4">
           <div className="flex items-center gap-2 flex-1 bg-[#010409] border border-[#1e1e2e] rounded px-2 h-6">
             <Search className="w-3 h-3 text-[#8b949e]" />
@@ -153,9 +189,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Main Area */}
         <main className="flex-1 p-4">
-          {/* Header */}
           <div className="mb-4">
             <h1 className="text-[16px] font-semibold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Dashboard</h1>
           </div>
@@ -173,17 +207,21 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Plan</p>
-                <p className="text-[18px] font-bold text-[#e6edf3] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.plan || '—'}</p>
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Messages Today</p>
+                <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
+                  {userData?.messages_today || 0}
+                </p>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">WhatsApp</p>
-                <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.whatsapp_number || '—'}</p>
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Plan</p>
+                <p className="text-[18px] font-bold text-[#e6edf3] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
+                  {getPlanDisplay()} {getPlanPrice()}
+                </p>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">API Key</p>
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">WhatsApp</p>
                 <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-                  {userData?.gemini_api_key ? '****' : '—'}
+                  {maskPhone(userData?.whatsapp_number)}
                 </p>
               </div>
             </div>
@@ -213,12 +251,55 @@ export default function Dashboard() {
             <div className="border-b border-[#1e1e2e]"></div>
           </div>
 
-          {/* WhatsApp Connection Section */}
+          {/* Recent Activity Section */}
+          <div className="mb-6">
+            <h2 className="text-[13px] font-semibold text-[#e6edf3] uppercase mb-2" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Recent Activity</h2>
+            {requests.length > 0 ? (
+              <div>
+                {requests.map((req, idx) => (
+                  <div 
+                    key={req.id} 
+                    className="py-2.5 border-b border-[#1e1e2e] last:border-b-0 hover:bg-[#0d0d18] transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 bg-[#388bfd] rounded-full" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-[#e6edf3]">{req.request}</p>
+                        <p className="text-[12px] text-[#8b949e]">{req.response}</p>
+                      </div>
+                      <span className="text-[11px] text-[#8b949e]">{req.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[13px] text-[#8b949e] italic text-center py-4">No requests yet — start chatting with your bot on WhatsApp!</p>
+            )}
+            <div className="border-b border-[#1e1e2e]"></div>
+          </div>
+
+          {/* Phone Number Section */}
           <div className="mb-6">
             <div className="flex items-center justify-between py-2">
-              <div>
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Phone Number</p>
-                <p className="text-[13px] font-medium text-[#e6edf3]">{userData?.whatsapp_number || 'Not configured'}</p>
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Phone Number</p>
+                  {userData?.whatsapp_number ? (
+                    <p className="text-[13px] font-medium text-[#e6edf3]">
+                      {showPhone ? userData.whatsapp_number : maskPhone(userData.whatsapp_number)}
+                    </p>
+                  ) : (
+                    <p className="text-[13px] font-medium text-[#8b949e]">Not configured</p>
+                  )}
+                </div>
+                {userData?.whatsapp_number && (
+                  <button
+                    onClick={() => setShowPhone(!showPhone)}
+                    className="p-1.5 hover:bg-[#0d0d18] rounded transition-colors"
+                  >
+                    {showPhone ? <EyeOff className="w-4 h-4 text-[#8b949e]" /> : <Eye className="w-4 h-4 text-[#8b949e]" />}
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5">
@@ -227,25 +308,36 @@ export default function Dashboard() {
                     {userData?.whatsapp_number ? 'Connected' : 'Not connected'}
                   </span>
                 </span>
-                <button className="flex items-center gap-1.5 px-2.5 h-7 border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#8b949e] text-[12px] rounded transition-colors">
-                  <RefreshCw className="w-3 h-3" />
-                  Reconnect
+                <button className="px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
+                  Edit
                 </button>
               </div>
             </div>
             <div className="border-b border-[#1e1e2e]"></div>
           </div>
 
-          {/* API Settings Section */}
+          {/* API Key Section */}
           <div className="mb-6">
             <div className="flex items-center justify-between py-2">
-              <div>
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">API Key</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] text-[#e6edf3] font-mono">
-                    {userData?.gemini_api_key ? userData.gemini_api_key.slice(0, 15) + '••••••••••••' : 'Not configured'}
-                  </span>
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">API Key</p>
+                  {userData?.gemini_api_key ? (
+                    <p className="text-[13px] text-[#e6edf3] font-mono">
+                      {showApiKey ? userData.gemini_api_key : maskApiKey(userData.gemini_api_key)}
+                    </p>
+                  ) : (
+                    <p className="text-[13px] font-medium text-[#8b949e]">Not configured</p>
+                  )}
                 </div>
+                {userData?.gemini_api_key && (
+                  <button
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="p-1.5 hover:bg-[#0d0d18] rounded transition-colors"
+                  >
+                    {showApiKey ? <EyeOff className="w-4 h-4 text-[#8b949e]" /> : <Eye className="w-4 h-4 text-[#8b949e]" />}
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5">
@@ -254,8 +346,8 @@ export default function Dashboard() {
                     {userData?.gemini_api_key ? 'Active' : 'Not configured'}
                   </span>
                 </span>
-                <button className="px-2.5 h-7 border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#8b949e] text-[12px] rounded transition-colors">
-                  Edit
+                <button className={`px-2.5 h-7 text-[12px] font-medium rounded transition-colors ${userData?.gemini_api_key ? 'border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#8b949e]' : 'bg-[#388bfd] hover:bg-[#1f6feb] text-white'}`}>
+                  {userData?.gemini_api_key ? 'Edit' : 'Add'}
                 </button>
               </div>
             </div>
@@ -268,15 +360,15 @@ export default function Dashboard() {
               <div className="flex items-center gap-8">
                 <div>
                   <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Current Plan</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3] capitalize">{userData?.plan || '—'}</p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanDisplay()}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Price</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">${userData?.plan === 'pro' ? '19' : userData?.plan === 'basic' ? '9' : '—'}<span className="text-[#8b949e] font-normal">{userData?.plan ? '/month' : ''}</span></p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanPrice()}<span className="text-[#8b949e] font-normal">/month</span></p>
                 </div>
                 <div>
                   <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Next Billing</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">{userData?.next_billing || '—'}</p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getNextBilling()}</p>
                 </div>
               </div>
               <button className="px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
