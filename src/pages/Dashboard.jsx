@@ -2,14 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { API_BASE_URL } from '../api';
-import { Home, Bot, MessageCircle, Key, CreditCard, HelpCircle, LogOut, RefreshCw, Power, RotateCcw, Search } from 'lucide-react';
+import { Home, HelpCircle, LogOut, RefreshCw, Power, RotateCcw, Search } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
-  { id: 'bot', label: 'Bot Status', icon: Bot },
-  { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
-  { id: 'api', label: 'API Settings', icon: Key },
-  { id: 'billing', label: 'Billing', icon: CreditCard },
 ];
 
 const bottomMenuItems = [
@@ -77,7 +73,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* Sidebar */}
-      <aside className="w-[200px] bg-[#0d1117] border-r border-[#1e1e2e] flex flex-col fixed h-full">
+      <aside className="w-[200px] bg-[#000000] border-r border-[#1e1e2e] flex flex-col fixed h-full">
         {/* Logo */}
         <div className="p-4 border-b border-[#1e1e2e]">
           <div className="flex items-center gap-2">
@@ -150,7 +146,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="flex-1 ml-[200px] flex flex-col min-h-screen">
         {/* Top Search Bar */}
-        <div className="h-10 bg-[#0d1117] border-b border-[#1e1e2e] flex items-center px-4">
+        <div className="h-10 bg-[#000000] border-b border-[#1e1e2e] flex items-center px-4">
           <div className="flex items-center gap-2 flex-1 bg-[#010409] border border-[#1e1e2e] rounded px-2 h-6">
             <Search className="w-3 h-3 text-[#8b949e]" />
             <input
