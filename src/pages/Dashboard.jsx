@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { API_BASE_URL } from '../api';
 import { Home, HelpCircle, LogOut, RefreshCw, Power, RotateCcw, Search } from 'lucide-react';
 
 const menuItems = [
@@ -18,15 +17,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [userData, setUserData] = useState(null);
-  const [messages] = useState(247);
-  const [uptime] = useState(99.8);
-  const [recentActivity] = useState([
-    { time: '2 min ago', user: 'What is AI?', bot: 'Artificial Intelligence is...' },
-    { time: '15 min ago', user: 'Help me code', bot: 'I can help you with...' },
-    { time: '1 hour ago', user: 'Weather in Mumbai', bot: 'Current weather...' },
-    { time: '2 hours ago', user: 'Set reminder', bot: 'Reminder set for...' },
-    { time: '3 hours ago', user: 'Book flight', bot: 'I found flights...' },
-  ]);
 
   useEffect(() => {
     fetchUser();
@@ -41,10 +31,16 @@ export default function Dashboard() {
       }
       setUser(session.user);
 
-      const response = await fetch(`${API_BASE_URL}/dashboard/${session.user.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data);
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user data:', error);
+      } else {
+        setUserData(userData);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -170,23 +166,25 @@ export default function Dashboard() {
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
                 <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Bot Status</p>
                 <div className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.bot_status === 'running' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.bot_status === 'live' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
                   <span className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-                    {userData?.bot_status === 'running' ? 'LIVE' : 'OFFLINE'}
+                    {userData?.bot_status === 'live' ? 'LIVE' : 'OFFLINE'}
                   </span>
                 </div>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Messages Today</p>
-                <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{messages}</p>
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Plan</p>
+                <p className="text-[18px] font-bold text-[#e6edf3] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.plan || '—'}</p>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Plan</p>
-                <p className="text-[18px] font-bold text-[#e6edf3] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.plan || 'Basic'}</p>
-              </div>
-              <div className="flex-1 px-4 py-2 flex flex-col justify-center">
                 <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">WhatsApp</p>
                 <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>{userData?.whatsapp_number || '—'}</p>
+              </div>
+              <div className="flex-1 px-4 py-2 flex flex-col justify-center">
+                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">API Key</p>
+                <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
+                  {userData?.gemini_api_key ? '****' : '—'}
+                </p>
               </div>
             </div>
             <div className="border-b border-[#1e1e2e]"></div>
@@ -196,9 +194,10 @@ export default function Dashboard() {
           <div className="mb-6">
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 bg-[#3fb950] rounded-full" />
-                <span className="text-[13px] font-medium text-[#3fb950]">LIVE</span>
-                <span className="text-[11px] text-[#8b949e]">Uptime: {uptime}%</span>
+                <span className={`w-1.5 h-1.5 rounded-full ${userData?.bot_status === 'live' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
+                <span className={`text-[13px] font-medium ${userData?.bot_status === 'live' ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                  {userData?.bot_status === 'live' ? 'LIVE' : 'OFFLINE'}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <button className="flex items-center gap-1.5 px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
@@ -214,40 +213,19 @@ export default function Dashboard() {
             <div className="border-b border-[#1e1e2e]"></div>
           </div>
 
-          {/* Recent Activity Section */}
-          <div className="mb-6">
-            <h2 className="text-[13px] font-semibold text-[#e6edf3] uppercase mb-2" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Recent Activity</h2>
-            <div>
-              {recentActivity.map((activity, idx) => (
-                <div 
-                  key={idx} 
-                  className="py-2.5 border-b border-[#1a1a2a] last:border-b-0 hover:bg-[#0d0d18] transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 bg-[#388bfd] rounded-full" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-[#e6edf3]">{activity.user}</p>
-                      <p className="text-[12px] text-[#8b949e]">{activity.bot}</p>
-                    </div>
-                    <span className="text-[11px] text-[#8b949e]">{activity.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="border-b border-[#1e1e2e]"></div>
-          </div>
-
           {/* WhatsApp Connection Section */}
           <div className="mb-6">
             <div className="flex items-center justify-between py-2">
               <div>
                 <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Phone Number</p>
-                <p className="text-[13px] font-medium text-[#e6edf3]">{userData?.whatsapp_number || '—'}</p>
+                <p className="text-[13px] font-medium text-[#e6edf3]">{userData?.whatsapp_number || 'Not configured'}</p>
               </div>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-[#3fb950] rounded-full" />
-                  <span className="text-[12px] text-[#3fb950]">Connected</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.whatsapp_number ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
+                  <span className={`text-[12px] ${userData?.whatsapp_number ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                    {userData?.whatsapp_number ? 'Connected' : 'Not connected'}
+                  </span>
                 </span>
                 <button className="flex items-center gap-1.5 px-2.5 h-7 border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#8b949e] text-[12px] rounded transition-colors">
                   <RefreshCw className="w-3 h-3" />
@@ -265,14 +243,16 @@ export default function Dashboard() {
                 <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">API Key</p>
                 <div className="flex items-center gap-2">
                   <span className="text-[13px] text-[#e6edf3] font-mono">
-                    {userData?.gemini_api_key ? userData.gemini_api_key.slice(0, 20) + '••••••••' : '••••••••••••••••'}
+                    {userData?.gemini_api_key ? userData.gemini_api_key.slice(0, 15) + '••••••••••••' : 'Not configured'}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-[#3fb950] rounded-full" />
-                  <span className="text-[12px] text-[#3fb950]">Active</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.gemini_api_key ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
+                  <span className={`text-[12px] ${userData?.gemini_api_key ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                    {userData?.gemini_api_key ? 'Active' : 'Not configured'}
+                  </span>
                 </span>
                 <button className="px-2.5 h-7 border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#8b949e] text-[12px] rounded transition-colors">
                   Edit
@@ -288,15 +268,15 @@ export default function Dashboard() {
               <div className="flex items-center gap-8">
                 <div>
                   <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Current Plan</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3] capitalize">{userData?.plan || 'Basic'}</p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3] capitalize">{userData?.plan || '—'}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Price</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">${userData?.plan === 'pro' ? '19' : '9'}<span className="text-[#8b949e] font-normal">/month</span></p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3]">${userData?.plan === 'pro' ? '19' : userData?.plan === 'basic' ? '9' : '—'}<span className="text-[#8b949e] font-normal">{userData?.plan ? '/month' : ''}</span></p>
                 </div>
                 <div>
                   <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Next Billing</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">April 18, 2026</p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3]">{userData?.next_billing || '—'}</p>
                 </div>
               </div>
               <button className="px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
