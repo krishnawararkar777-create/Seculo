@@ -134,7 +134,7 @@ export default function Dashboard() {
                     className={`w-full flex items-center gap-2 px-3 h-8 rounded text-[13px] font-medium transition-colors ${
                       isActive
                         ? 'bg-[#1c2128] text-white border-l-[2px] border-[#388bfd]'
-                        : 'text-[#8b949e] hover:text-white hover:bg-[#161b22]'
+                        : 'text-[#ffffff] hover:text-white hover:bg-[#161b22]'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ export default function Dashboard() {
                 <li key={item.id}>
                   <button
                     onClick={() => setActiveSection(item.id)}
-                    className="w-full flex items-center gap-2 px-3 h-8 text-[13px] font-medium text-[#8b949e] hover:text-white hover:bg-[#161b22] rounded transition-colors"
+                    className="w-full flex items-center gap-2 px-3 h-8 text-[13px] font-medium text-[#ffffff] hover:text-white hover:bg-[#161b22] rounded transition-colors"
                   >
                     <Icon className="w-3.5 h-3.5" />
                     {item.label}
@@ -165,10 +165,10 @@ export default function Dashboard() {
           </ul>
           
           <div className="mt-4 pt-3 border-t border-[#1e1e2e]">
-            <p className="text-[11px] text-[#8b949e] px-3 mb-2 truncate">{user?.email}</p>
+            <p className="text-[11px] text-[#ffffff] px-3 mb-2 truncate">{user?.email}</p>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-3 h-8 text-[13px] font-medium text-[#8b949e] hover:text-white hover:bg-[#161b22] rounded transition-colors"
+              className="w-full flex items-center gap-2 px-3 h-8 text-[13px] font-medium text-[#ffffff] hover:text-white hover:bg-[#161b22] rounded transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               Logout
@@ -180,7 +180,7 @@ export default function Dashboard() {
       <div className="flex-1 ml-[200px] flex flex-col min-h-screen">
         <div className="h-10 bg-[#000000] border-b border-[#1e1e2e] flex items-center px-4">
           <div className="flex items-center gap-2 flex-1 bg-[#010409] border border-[#1e1e2e] rounded px-2 h-6">
-            <Search className="w-3 h-3 text-[#8b949e]" />
+            <Search className="w-3 h-3 text-[#ffffff]" />
             <input
               type="text"
               placeholder="Search..."
@@ -198,7 +198,7 @@ export default function Dashboard() {
           <div className="mb-4">
             <div className="flex items-stretch">
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Bot Status</p>
+                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Bot Status</p>
                 <div className="flex items-center gap-1.5">
                   <span className={`w-1.5 h-1.5 rounded-full ${userData?.bot_status === 'live' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
                   <span className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
@@ -207,19 +207,19 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Messages Today</p>
+                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Messages Today</p>
                 <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
                   {userData?.messages_today || 0}
                 </p>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Plan</p>
+                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Plan</p>
                 <p className="text-[18px] font-bold text-[#e6edf3] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
                   {getPlanDisplay()} {getPlanPrice()}
                 </p>
               </div>
               <div className="flex-1 px-4 py-2 flex flex-col justify-center">
-                <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">WhatsApp</p>
+                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">WhatsApp</p>
                 <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
                   {maskPhone(userData?.whatsapp_number)}
                 </p>
@@ -265,15 +265,15 @@ export default function Dashboard() {
                       <div className="w-1.5 h-1.5 bg-[#388bfd] rounded-full" />
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-semibold text-[#e6edf3]">{req.request}</p>
-                        <p className="text-[12px] text-[#8b949e]">{req.response}</p>
+                        <p className="text-[12px] text-[#ffffff]">{req.response}</p>
                       </div>
-                      <span className="text-[11px] text-[#8b949e]">{req.time}</span>
+                      <span className="text-[11px] text-[#ffffff]">{req.time}</span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-[13px] text-[#8b949e] italic text-center py-4">No requests yet — start chatting with your bot on WhatsApp!</p>
+              <p className="text-[13px] text-[#ffffff] italic text-center py-4">No requests yet — start chatting with your bot on WhatsApp!</p>
             )}
             <div className="border-b border-[#1e1e2e]"></div>
           </div>
@@ -283,13 +283,13 @@ export default function Dashboard() {
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Phone Number</p>
+                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Phone Number</p>
                   {userData?.whatsapp_number ? (
                     <p className="text-[13px] font-medium text-[#e6edf3]">
                       {showPhone ? userData.whatsapp_number : maskPhone(userData.whatsapp_number)}
                     </p>
                   ) : (
-                    <p className="text-[13px] font-medium text-[#8b949e]">Not configured</p>
+                    <p className="text-[13px] font-medium text-[#ffffff]">Not configured</p>
                   )}
                 </div>
                 {userData?.whatsapp_number && (
@@ -297,7 +297,7 @@ export default function Dashboard() {
                     onClick={() => setShowPhone(!showPhone)}
                     className="p-1.5 hover:bg-[#0d0d18] rounded transition-colors"
                   >
-                    {showPhone ? <EyeOff className="w-4 h-4 text-[#8b949e]" /> : <Eye className="w-4 h-4 text-[#8b949e]" />}
+                    {showPhone ? <EyeOff className="w-4 h-4 text-[#ffffff]" /> : <Eye className="w-4 h-4 text-[#ffffff]" />}
                   </button>
                 )}
               </div>
@@ -321,13 +321,13 @@ export default function Dashboard() {
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">API Key</p>
+                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">API Key</p>
                   {userData?.gemini_api_key ? (
                     <p className="text-[13px] text-[#e6edf3] font-mono">
                       {showApiKey ? userData.gemini_api_key : maskApiKey(userData.gemini_api_key)}
                     </p>
                   ) : (
-                    <p className="text-[13px] font-medium text-[#8b949e]">Not configured</p>
+                    <p className="text-[13px] font-medium text-[#ffffff]">Not configured</p>
                   )}
                 </div>
                 {userData?.gemini_api_key && (
@@ -335,7 +335,7 @@ export default function Dashboard() {
                     onClick={() => setShowApiKey(!showApiKey)}
                     className="p-1.5 hover:bg-[#0d0d18] rounded transition-colors"
                   >
-                    {showApiKey ? <EyeOff className="w-4 h-4 text-[#8b949e]" /> : <Eye className="w-4 h-4 text-[#8b949e]" />}
+                    {showApiKey ? <EyeOff className="w-4 h-4 text-[#ffffff]" /> : <Eye className="w-4 h-4 text-[#ffffff]" />}
                   </button>
                 )}
               </div>
@@ -346,7 +346,7 @@ export default function Dashboard() {
                     {userData?.gemini_api_key ? 'Active' : 'Not configured'}
                   </span>
                 </span>
-                <button className={`px-2.5 h-7 text-[12px] font-medium rounded transition-colors ${userData?.gemini_api_key ? 'border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#8b949e]' : 'bg-[#388bfd] hover:bg-[#1f6feb] text-white'}`}>
+                <button className={`px-2.5 h-7 text-[12px] font-medium rounded transition-colors ${userData?.gemini_api_key ? 'border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#ffffff]' : 'bg-[#388bfd] hover:bg-[#1f6feb] text-white'}`}>
                   {userData?.gemini_api_key ? 'Edit' : 'Add'}
                 </button>
               </div>
@@ -359,15 +359,15 @@ export default function Dashboard() {
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-8">
                 <div>
-                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Current Plan</p>
+                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Current Plan</p>
                   <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanDisplay()}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Price</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanPrice()}<span className="text-[#8b949e] font-normal">/month</span></p>
+                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Price</p>
+                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanPrice()}<span className="text-[#ffffff] font-normal">/month</span></p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-medium text-[#8b949e] uppercase mb-0.5">Next Billing</p>
+                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Next Billing</p>
                   <p className="text-[13px] font-semibold text-[#e6edf3]">{getNextBilling()}</p>
                 </div>
               </div>
