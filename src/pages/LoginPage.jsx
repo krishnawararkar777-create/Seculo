@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -7,9 +7,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -34,7 +34,7 @@ export default function LoginPage() {
           navigate('/onboarding');
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -51,7 +51,7 @@ export default function LoginPage() {
         },
       });
       if (authError) throw authError;
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
       setLoading(false);
     }
@@ -63,7 +63,6 @@ export default function LoginPage() {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&display=swap');
       `}</style>
 
-      {/* Top Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-[#0a0a0f]/80 backdrop-blur-md border-b border-[#2a2a3a]">
         <div className="flex justify-between items-center px-8 h-16 max-w-7xl mx-auto">
           <button onClick={() => navigate('/')} className="text-2xl font-black tracking-tighter text-white font-['Plus_Jakarta_Sans'] cursor-pointer bg-transparent border-none">
@@ -72,16 +71,13 @@ export default function LoginPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="flex-grow flex items-center justify-center px-6 py-24">
         <div className="w-full max-w-md bg-[#131318] rounded-xl p-8 border border-[#2a2a3a]">
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
             <p className="text-[#bbcbb9] text-sm">Sign in to your account</p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-4">
             {error && (
               <div className="bg-red-500/20 border border-red-500/50 text-red-400 text-sm p-3 rounded-lg">
@@ -122,14 +118,12 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-4 my-6">
             <div className="h-px flex-1 bg-[#3c4a3d]/30"></div>
             <span className="text-xs text-[#bbcbb9] uppercase tracking-widest">Or continue with</span>
             <div className="h-px flex-1 bg-[#3c4a3d]/30"></div>
           </div>
 
-          {/* Google Button */}
           <button
             onClick={handleGoogleAuth}
             disabled={loading}
@@ -144,7 +138,6 @@ export default function LoginPage() {
             <span className="font-medium">Sign in with Google</span>
           </button>
 
-          {/* Sign Up Link */}
           <p className="text-center text-sm text-[#bbcbb9] mt-6">
             Don't have an account?{' '}
             <button onClick={() => navigate('/signup')} className="text-[#25D366] font-bold hover:underline cursor-pointer bg-transparent border-none">
