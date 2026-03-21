@@ -344,17 +344,17 @@ export default function Onboarding() {
           transform: scale(1.1);
         }
         .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
+          width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #1a1a24;
+          background: #2a2a3a;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #2a2a3a;
-          border-radius: 3px;
+          background: #25D366;
+          border-radius: 2px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #3a3a4a;
+          background: #25D366;
         }
       `}</style>
 
@@ -475,7 +475,7 @@ export default function Onboarding() {
                       <span className="text-[#bbcbb9] group-hover:text-[#25D366] transition-colors">▼</span>
                     </button>
                     {showCountryDropdown && (
-                      <div className="absolute top-full left-0 w-full mt-2 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl overflow-hidden shadow-xl z-50">
+                      <div className="absolute top-full left-0 mt-1 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl overflow-hidden shadow-xl z-[9999]" style={{ minWidth: '320px' }}>
                         <div className="p-2 border-b border-[#2a2a3a]">
                           <input
                             ref={searchInputRef}
@@ -483,7 +483,7 @@ export default function Onboarding() {
                             value={countrySearch}
                             onChange={(e) => setCountrySearch(e.target.value)}
                             placeholder="Search country..."
-                            className="w-full bg-[#0a0a0f] text-[#e4e1e9] placeholder:text-[#bbcbb9]/50 px-3 py-2 rounded-lg border border-[#2a2a3a] focus:border-[#25D366] focus:outline-none transition-all text-sm"
+                            className="w-full bg-[#111118] text-[#e4e1e9] placeholder:text-[#bbcbb9]/50 px-3 py-2 rounded-lg border border-[#2a2a3a] focus:border-[#25D366] focus:outline-none transition-all text-sm"
                           />
                         </div>
                         <div className="max-h-[280px] overflow-y-auto custom-scrollbar">
@@ -495,15 +495,15 @@ export default function Onboarding() {
                                 key={c.code}
                                 type="button"
                                 onClick={() => selectCountry(c)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-[#2a2a3a] transition-colors ${
+                                className={`w-full flex items-center gap-2 hover:bg-[#2a2a3a] transition-colors ${
                                   selectedCountry.code === c.code ? 'bg-[#25D366]/10' : ''
                                 }`}
-                                style={{ height: '44px' }}
+                                style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}
                               >
-                                <span className="text-xl">{c.flag}</span>
-                                <span className="text-[#bbcbb9]/60 text-xs font-mono w-8">{c.code}</span>
-                                <span className="text-[#25D366] text-sm font-semibold w-12 text-left">{c.dial}</span>
-                                <span className="text-[#e4e1e9] text-sm flex-1 text-left">{c.name}</span>
+                                <span style={{ fontSize: '24px', width: '24px', flexShrink: 0 }}>{c.flag}</span>
+                                <span className="text-[#bbcbb9]/60 text-xs font-mono" style={{ minWidth: '32px' }}>{c.code}</span>
+                                <span className="text-[#25D366] text-sm font-semibold" style={{ minWidth: '52px' }}>{c.dial}</span>
+                                <span className="text-[#e4e1e9] text-sm flex-1 text-left overflow-hidden text-ellipsis">{c.name}</span>
                               </button>
                             ))
                           )}
