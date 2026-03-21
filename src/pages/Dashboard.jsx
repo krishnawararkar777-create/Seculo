@@ -99,7 +99,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#010409] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#21262d] border-t-[#388bfd] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#21262d] border-t-[#25D366] rounded-full animate-spin" />
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function Dashboard() {
       <aside className="w-[200px] bg-[#000000] border-r border-[#1e1e2e] flex flex-col fixed h-full">
         <div className="p-4 border-b border-[#1e1e2e]">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#388bfd] rounded flex items-center justify-center">
+            <div className="w-5 h-5 bg-[#25D366] rounded flex items-center justify-center">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -133,7 +133,7 @@ export default function Dashboard() {
                     onClick={() => setActiveSection(item.id)}
                     className={`w-full flex items-center gap-2 px-3 h-8 rounded text-[13px] font-medium transition-colors ${
                       isActive
-                        ? 'bg-[#1c2128] text-white border-l-[2px] border-[#388bfd]'
+                        ? 'bg-[#1c2128] text-white border-l-[2px] border-[#25D366]'
                         : 'text-[#ffffff] hover:text-white hover:bg-[#161b22]'
                     }`}
                   >
@@ -238,7 +238,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
+                <button className="flex items-center gap-1.5 px-2.5 h-7 bg-[#25D366] hover:bg-[#1fa855] text-white text-[12px] font-medium rounded transition-colors">
                   <RotateCcw className="w-3 h-3" />
                   Restart Bot
                 </button>
@@ -262,7 +262,7 @@ export default function Dashboard() {
                     className="py-2.5 border-b border-[#1e1e2e] last:border-b-0 hover:bg-[#0d0d18] transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-[#388bfd] rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-[#25D366] rounded-full" />
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-semibold text-[#e6edf3]">{req.request}</p>
                         <p className="text-[12px] text-[#ffffff]">{req.response}</p>
@@ -308,7 +308,7 @@ export default function Dashboard() {
                     {userData?.whatsapp_number ? 'Connected' : 'Not connected'}
                   </span>
                 </span>
-                <button className="px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
+                <button className="px-2.5 h-7 bg-[#25D366] hover:bg-[#1fa855] text-white text-[12px] font-medium rounded transition-colors">
                   Edit
                 </button>
               </div>
@@ -346,7 +346,7 @@ export default function Dashboard() {
                     {userData?.gemini_api_key ? 'Active' : 'Not configured'}
                   </span>
                 </span>
-                <button className={`px-2.5 h-7 text-[12px] font-medium rounded transition-colors ${userData?.gemini_api_key ? 'border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#ffffff]' : 'bg-[#388bfd] hover:bg-[#1f6feb] text-white'}`}>
+                <button className={`px-2.5 h-7 text-[12px] font-medium rounded transition-colors ${userData?.gemini_api_key ? 'border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#ffffff]' : 'bg-[#25D366] hover:bg-[#1fa855] text-white'}`}>
                   {userData?.gemini_api_key ? 'Edit' : 'Add'}
                 </button>
               </div>
@@ -371,7 +371,7 @@ export default function Dashboard() {
                   <p className="text-[13px] font-semibold text-[#e6edf3]">{getNextBilling()}</p>
                 </div>
               </div>
-              <button className="px-2.5 h-7 bg-[#388bfd] hover:bg-[#1f6feb] text-white text-[12px] font-medium rounded transition-colors">
+              <button className="px-2.5 h-7 bg-[#25D366] hover:bg-[#1fa855] text-white text-[12px] font-medium rounded transition-colors">
                 Upgrade Plan
               </button>
             </div>
