@@ -112,7 +112,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-12 flex flex-col items-center gap-4">
             <div className="flex -space-x-3">
-              <div className="w-10 h-10 rounded-full border-2 border-background bg-blue-500"></div>
+              <div className="w-10 h-10 rounded-full border-2 border-background bg-green-500"></div>
               <div className="w-10 h-10 rounded-full border-2 border-background bg-purple-500"></div>
               <div className="w-10 h-10 rounded-full border-2 border-background bg-emerald-500"></div>
               <div className="w-10 h-10 rounded-full border-2 border-background bg-orange-500"></div>

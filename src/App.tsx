@@ -93,7 +93,7 @@ const AuthPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full appearance-none rounded-md border border-white/10 bg-[#1A1A1A] px-3 py-2 placeholder-gray-500 text-white focus:border-[#155dfd] focus:outline-none focus:ring-[#155dfd] sm:text-sm"
+                  className="block w-full appearance-none rounded-md border border-white/10 bg-[#1A1A1A] px-3 py-2 placeholder-gray-500 text-white focus:border-[#25D366] focus:outline-none focus:ring-[#25D366] sm:text-sm"
                 />
               </div>
             </div>
@@ -111,7 +111,7 @@ const AuthPage = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full appearance-none rounded-md border border-white/10 bg-[#1A1A1A] px-3 py-2 placeholder-gray-500 text-white focus:border-[#155dfd] focus:outline-none focus:ring-[#155dfd] sm:text-sm"
+                  className="block w-full appearance-none rounded-md border border-white/10 bg-[#1A1A1A] px-3 py-2 placeholder-gray-500 text-white focus:border-[#25D366] focus:outline-none focus:ring-[#25D366] sm:text-sm"
                 />
               </div>
             </div>
@@ -120,7 +120,7 @@ const AuthPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full justify-center rounded-md border border-transparent bg-[#155dfd] py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-[#104bc2] focus:outline-none focus:ring-2 focus:ring-[#155dfd] focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 transition-colors"
+                className="flex w-full justify-center rounded-md border border-transparent bg-[#25D366] py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-[#1fa855] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Processing...' : isSignUp ? 'Sign up' : 'Sign in'}
               </button>
@@ -141,7 +141,7 @@ const AuthPage = () => {
               <button
                 onClick={handleGoogleAuth}
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-3 rounded-md border border-white/10 bg-[#1A1A1A] py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-[#222222] focus:outline-none focus:ring-2 focus:ring-[#155dfd] focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 transition-colors"
+                className="flex w-full items-center justify-center gap-3 rounded-md border border-white/10 bg-[#1A1A1A] py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-[#222222] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 focus:ring-offset-[#0A0A0A] disabled:opacity-50 transition-colors"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
@@ -169,7 +169,7 @@ const AuthPage = () => {
           <div className="mt-6 text-center">
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm font-medium text-[#155dfd] hover:text-[#104bc2] transition-colors"
+              className="text-sm font-medium text-[#25D366] hover:text-[#1fa855] transition-colors"
             >
               {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>
@@ -205,7 +205,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-white/10 border-t-[#155dfd] rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-white/10 border-t-[#25D366] rounded-full animate-spin" />
       </div>
     );
   }
