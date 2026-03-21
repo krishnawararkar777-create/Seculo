@@ -10,6 +10,24 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const checkUserAndRedirect = async (session) => {
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('whatsapp_number')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (userData?.whatsapp_number) {
+        navigate('/dashboard');
+      } else {
+        navigate('/onboarding');
+      }
+    } catch (err) {
+      navigate('/onboarding');
+    }
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -26,7 +44,13 @@ export default function SignupPage() {
         },
       });
       if (authError) throw authError;
-      alert('Check your email for the confirmation link!');
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await checkUserAndRedirect(session);
+      } else {
+        alert('Check your email for the confirmation link!');
+      }
     } catch (err) {
       setError(err.message);
     } finally {

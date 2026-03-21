@@ -9,6 +9,24 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const checkUserAndRedirect = async (session) => {
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('whatsapp_number')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (userData?.whatsapp_number) {
+        navigate('/dashboard');
+      } else {
+        navigate('/onboarding');
+      }
+    } catch (err) {
+      navigate('/onboarding');
+    }
+  };
+
   const handleSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -22,17 +40,7 @@ export default function LoginPage() {
       
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('whatsapp_number')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (userData?.whatsapp_number) {
-          navigate('/dashboard');
-        } else {
-          navigate('/onboarding');
-        }
+        await checkUserAndRedirect(session);
       }
     } catch (err) {
       setError(err.message);
