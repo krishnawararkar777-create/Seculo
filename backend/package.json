@@ -1,16 +1,19 @@
 {
-  "name": "seculo-backend",
+  "name": "seculo-bot-manager",
   "version": "1.0.0",
   "type": "module",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "22"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.2",
-    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "node-pty": "^1.0.0",
+    "qrcode": "^1.5.4"
   }
 }
