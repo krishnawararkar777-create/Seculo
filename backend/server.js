@@ -25,6 +25,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.post('/api/onboard', onboard);
 app.post('/api/bot/create', createBot);
 app.post('/api/bot/stop', stopBotRoute);
