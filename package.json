@@ -11,6 +11,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "qrcode": "^1.5.3",
     "@google/genai": "^1.29.0",
     "@supabase/supabase-js": "^2.99.2",
     "@tailwindcss/vite": "^4.1.14",
