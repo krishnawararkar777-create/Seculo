@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -8,19 +8,43 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [messagesToday, setMessagesToday] = useState(0);
+  const [lastMessage, setLastMessage] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [restarting, setRestarting] = useState(false);
   const [restartMsg, setRestartMsg] = useState('');
-  const styleRef = useRef(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchUserData();
+    fetchAllData();
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
-  const fetchUserData = async () => {
+  useEffect(() => {
+    if (!user?.id) return;
+    const subscription = supabase
+      .channel('users-realtime')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'users',
+        filter: `id=eq.${user.id}`,
+      }, (payload) => {
+        setUserData(payload.new);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [user?.id]);
+
+  const fetchAllData = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -28,22 +52,62 @@ export default function Dashboard() {
         return;
       }
       setUser(session.user);
+      setError('');
 
-      const { data: data, error } = await supabase
+      const { data: data, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('id', session.user.id)
         .single();
       
-      if (error) {
-        console.error('Error fetching user data:', error);
+      if (userError) {
+        console.error('Error fetching user data:', userError);
+        setError('Could not load data. Please refresh.');
       } else {
         setUserData(data);
       }
-    } catch (error) {
-      console.error('Error:', error);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      try {
+        const { count, error: msgError } = await supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .gte('created_at', today.toISOString())
+          .lt('created_at', tomorrow.toISOString());
+        
+        if (!msgError) {
+          setMessagesToday(count || 0);
+        }
+      } catch (e) {
+        console.log('Messages table not available');
+      }
+
+      try {
+        const { data: lastMsg, error: lastError } = await supabase
+          .from('messages')
+          .select('created_at')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (!lastError && lastMsg) {
+          setLastMessage(lastMsg);
+        }
+      } catch (e) {
+        console.log('Messages table not available');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Could not load data. Please refresh.');
     } finally {
       setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -79,12 +143,12 @@ export default function Dashboard() {
   };
 
   const getPlanDisplay = () => {
-    if (!userData?.plan) return 'Basic';
-    return userData.plan.charAt(0).toUpperCase() + userData.plan.slice(1);
+    if (!userData?.plan) return 'No Plan';
+    return userData.plan.charAt(0).toUpperCase() + userData.plan.slice(1) + ' Plan';
   };
 
   const getPlanPrice = () => {
-    if (userData?.plan === 'pro') return '₹2,499';
+    if (userData?.plan === 'pro') return '₹1,500';
     if (userData?.plan === 'basic') return '₹750';
     return '₹0';
   };
@@ -93,26 +157,70 @@ export default function Dashboard() {
     if (!userData?.created_at) return 'Not available';
     const date = new Date(userData.created_at);
     date.setDate(date.getDate() + 30);
-    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    const day = date.getDate().toString().padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
   };
 
   const getBotStatus = () => {
     if (userData?.bot_status === 'live') {
       return { status: 'Healthy', color: '#3ECF8E', dot: true };
     }
+    if (userData?.bot_status === 'pending') {
+      return { status: 'Setting Up', color: '#ffb956', dot: true };
+    }
     return { status: 'Offline', color: '#ffb4ab', dot: false };
   };
 
-  const getApiStatus = () => {
-    if (userData?.gemini_api_key) {
-      return { status: 'Valid', color: '#3ECF8E', valid: true };
-    }
-    return { status: 'Invalid', color: '#ffb4ab', valid: false };
+  const getConnectionStatus = () => {
+    if (userData?.bot_status === 'live') return 'Connected';
+    return 'Disconnected';
   };
 
-  const getMessagesToday = () => {
-    return userData?.messages_today || 0;
+  const getApiStatus = () => {
+    if (userData?.gemini_api_key && userData.gemini_api_key.trim() !== '') {
+      return { status: 'Valid', color: '#3ECF8E', valid: true };
+    }
+    return { status: 'Not configured', color: '#ffb4ab', valid: false };
   };
+
+  const getUserName = () => {
+    if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
+    if (user?.user_metadata?.name) return user.user_metadata.name;
+    return user?.email?.split('@')[0] || 'User';
+  };
+
+  const getUserAvatar = () => {
+    if (user?.user_metadata?.avatar_url) return user.user_metadata.avatar_url;
+    if (user?.user_metadata?.picture) return user.user_metadata.picture;
+    return null;
+  };
+
+  const getLastMessageTime = () => {
+    if (!lastMessage?.created_at) return 'No messages yet';
+    const msgDate = new Date(lastMessage.created_at);
+    const now = new Date();
+    const diffMs = now - msgDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
+  const SkeletonBox = ({ width = '100%', height = 20 }) => (
+    <div style={{
+      width,
+      height,
+      backgroundColor: 'rgba(255,255,255,0.05)',
+      borderRadius: 4,
+      animation: 'pulse 1.5s infinite',
+    }} />
+  );
 
   if (loading) {
     return (
@@ -125,6 +233,8 @@ export default function Dashboard() {
 
   const botStatus = getBotStatus();
   const apiStatus = getApiStatus();
+  const userAvatar = getUserAvatar();
+  const userName = getUserName();
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#101010', color: '#ededed', fontFamily: 'Geist, sans-serif' }}>
@@ -145,13 +255,13 @@ export default function Dashboard() {
           ⌨️
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: 6, transition: 'all 0.2s', transform: 'scale(0.95)' }}
           >
             <span style={{ fontSize: 20 }}>🏠</span>
           </button>
-          <button 
+          <button
             onClick={() => navigate('/logs')}
             style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s', transform: 'scale(0.95)' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
@@ -162,7 +272,7 @@ export default function Dashboard() {
           <button style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s', transform: 'scale(0.95)' }}>
             <span style={{ fontSize: 20 }}>⌨️</span>
           </button>
-          <button 
+          <button
             onClick={() => navigate('/settings')}
             style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s', transform: 'scale(0.95)' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
@@ -186,7 +296,7 @@ export default function Dashboard() {
             <span style={{ fontSize: 20 }}>📄</span>
           </button>
         </nav>
-        <button 
+        <button
           onClick={handleLogout}
           style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', transition: 'all 0.2s', transform: 'scale(0.95)' }}
           onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
@@ -214,29 +324,50 @@ export default function Dashboard() {
               <span style={{ fontSize: 20, cursor: 'pointer' }}>🔔</span>
               <span style={{ fontSize: 20, cursor: 'pointer' }}>❓</span>
             </div>
-            <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: '#2a2a2a', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#3ECF8E' }}>{user?.email?.[0]?.toUpperCase() || 'U'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#ededed' }}>{userName}</p>
+                <p style={{ fontSize: 10, color: '#3ECF8E', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{getPlanDisplay()}</p>
+              </div>
+              {userAvatar ? (
+                <img src={userAvatar} alt={userName} style={{ width: 24, height: 24, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: '#2a2a2a', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#3ECF8E' }}>{userName[0]?.toUpperCase() || 'U'}</span>
+                </div>
+              )}
             </div>
           </div>
         </header>
 
         {/* Content Area */}
         <div style={{ marginTop: 48, padding: 32, maxWidth: 1400, marginLeft: 'auto', marginRight: 'auto', display: 'flex', flexDirection: 'column', gap: 32 }}>
+          {/* Error Banner */}
+          {error && (
+            <div style={{ padding: '12px 16px', backgroundColor: 'rgba(255,180,171,0.1)', border: '1px solid rgba(255,180,171,0.3)', borderRadius: 8, color: '#ffb4ab', fontFamily: 'Geist Mono, monospace', fontSize: 12 }}>
+              {error}
+            </div>
+          )}
+
           {/* Dashboard Title */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div>
               <h2 style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em', color: '#ededed' }}>Seculo WhatsApp Bot</h2>
-              <p style={{ color: '#a0a0a0', fontSize: 12, fontFamily: 'Geist Mono, monospace' }}>ID: SEC-WA-{user?.id?.slice(0,8).toUpperCase() || 'USER'}-PRO</p>
+              {dataLoading ? (
+                <SkeletonBox width={200} height={14} />
+              ) : (
+                <p style={{ color: '#a0a0a0', fontSize: 12, fontFamily: 'Geist Mono, monospace' }}>ID: SEC-WA-{user?.id?.slice(0,8).toUpperCase() || 'USER'}-{getPlanDisplay().split(' ')[0].toUpperCase()}</p>
+              )}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button 
+              <button
                 onClick={handleRestart}
                 disabled={restarting}
-                style={{ padding: '6px 16px', backgroundColor: '#3ECF8E', color: '#003822', fontSize: 12, fontWeight: 600, borderRadius: 6, transition: 'all 0.2s', opacity: restarting ? 0.6 : 1, cursor: restarting ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '6px 16px', backgroundColor: '#3ECF8E', color: '#003822', fontSize: 12, fontWeight: 600, borderRadius: 6, transition: 'all 0.2s', opacity: restarting ? 0.6 : 1, cursor: restarting ? 'not-allowed' : 'pointer', border: 'none' }}
               >
                 {restarting ? 'Restarting...' : 'RESTART INSTANCE'}
               </button>
-              <button 
+              <button
                 onClick={() => navigate('/logs')}
                 style={{ padding: '6px 16px', border: '1px solid rgba(255,255,255,0.08)', color: '#ededed', fontSize: 12, fontWeight: 600, borderRadius: 6, transition: 'all 0.2s', cursor: 'pointer', backgroundColor: 'transparent' }}
               >
@@ -258,25 +389,41 @@ export default function Dashboard() {
             <div style={{ gridColumn: 'span 12 / span 4', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
               <div style={{ backgroundColor: '#141414', padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 120 }}>
                 <span className="mono-label">BOT STATUS</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: botStatus.color, animation: botStatus.dot ? 'pulse 2s infinite' : 'none' }}></div>
-                  <span style={{ fontSize: 18, fontWeight: 500, color: '#ededed' }}>{botStatus.status}</span>
-                </div>
+                {dataLoading ? (
+                  <SkeletonBox width={80} height={20} />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: botStatus.color, animation: botStatus.dot ? 'pulse 2s infinite' : 'none' }}></div>
+                    <span style={{ fontSize: 18, fontWeight: 500, color: '#ededed' }}>{botStatus.status}</span>
+                  </div>
+                )}
               </div>
               <div style={{ backgroundColor: '#141414', padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 120 }}>
                 <span className="mono-label">LAST MESSAGE</span>
-                <span style={{ fontSize: 18, fontFamily: 'Geist Mono, monospace', color: '#ededed' }}>2m ago</span>
+                {dataLoading ? (
+                  <SkeletonBox width={60} height={20} />
+                ) : (
+                  <span style={{ fontSize: 18, fontFamily: 'Geist Mono, monospace', color: '#ededed' }}>{getLastMessageTime()}</span>
+                )}
               </div>
               <div style={{ backgroundColor: '#141414', padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 120 }}>
                 <span className="mono-label">CONNECTION</span>
-                <span style={{ fontSize: 18, fontWeight: 500, color: '#ededed' }}>{userData?.whatsapp_number ? 'Connected' : 'Disconnected'}</span>
+                {dataLoading ? (
+                  <SkeletonBox width={100} height={20} />
+                ) : (
+                  <span style={{ fontSize: 18, fontWeight: 500, color: '#ededed' }}>{getConnectionStatus()}</span>
+                )}
               </div>
               <div style={{ backgroundColor: '#141414', padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 120 }}>
                 <span className="mono-label">GEMINI KEY</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: apiStatus.color }}>
-                  <span style={{ fontSize: 18 }}>✅</span>
-                  <span style={{ fontSize: 18, fontWeight: 500 }}>{apiStatus.status}</span>
-                </div>
+                {dataLoading ? (
+                  <SkeletonBox width={60} height={20} />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: apiStatus.color }}>
+                    <span style={{ fontSize: 18 }}>{apiStatus.valid ? '✅' : '❌'}</span>
+                    <span style={{ fontSize: 18, fontWeight: 500 }}>{apiStatus.status}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -292,7 +439,11 @@ export default function Dashboard() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, marginTop: 32 }}>
                 <div>
                   <span className="mono-label">LINKED NUMBER</span>
-                  <p className="data-mono" style={{ fontSize: 14, marginTop: 4, color: '#ededed' }}>{userData?.whatsapp_number || 'Not configured'}</p>
+                  {dataLoading ? (
+                    <SkeletonBox width={120} height={16} />
+                  ) : (
+                    <p className="data-mono" style={{ fontSize: 14, marginTop: 4, color: '#ededed' }}>{userData?.whatsapp_number || 'Not configured'}</p>
+                  )}
                 </div>
                 <div>
                   <span className="mono-label">REGION</span>
@@ -313,9 +464,9 @@ export default function Dashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span className="mono-label">BOT STATUS REAL-TIME</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 8px', backgroundColor: 'rgba(255,80,80,0.1)', borderRadius: 4, border: '1px solid rgba(255,80,80,0.2)' }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#ff5050', animation: 'pulse 1s infinite' }}></span>
-                    <span style={{ fontSize: 9, fontFamily: 'Geist Mono, monospace', color: '#ff5050', fontWeight: 'bold' }}>LIVE</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 8px', backgroundColor: userData?.bot_status === 'live' ? 'rgba(62,207,142,0.1)' : 'rgba(255,80,80,0.1)', borderRadius: 4, border: `1px solid ${userData?.bot_status === 'live' ? 'rgba(62,207,142,0.2)' : 'rgba(255,80,80,0.2)'}` }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: userData?.bot_status === 'live' ? '#3ECF8E' : '#ff5050', animation: userData?.bot_status === 'live' ? 'pulse 1s infinite' : 'none' }}></span>
+                    <span style={{ fontSize: 9, fontFamily: 'Geist Mono, monospace', color: userData?.bot_status === 'live' ? '#3ECF8E' : '#ff5050', fontWeight: 'bold' }}>{userData?.bot_status === 'live' ? 'LIVE' : 'OFFLINE'}</span>
                   </div>
                 </div>
                 <span style={{ fontSize: 20, color: 'rgba(255,255,255,0.2)' }}>⋮</span>
@@ -359,11 +510,19 @@ export default function Dashboard() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                   <div>
                     <span className="mono-label">BILLING PLAN</span>
-                    <h4 style={{ color: '#ededed', fontWeight: 600, marginTop: 4 }}>Obsidian {getPlanDisplay()}</h4>
+                    {dataLoading ? (
+                      <SkeletonBox width={100} height={18} />
+                    ) : (
+                      <h4 style={{ color: '#ededed', fontWeight: 600, marginTop: 4 }}>{getPlanDisplay()}</h4>
+                    )}
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span className="mono-label">COST</span>
-                    <p style={{ color: '#ededed', fontFamily: 'Geist Mono, monospace', fontSize: 14 }}>{getPlanPrice()}/mo</p>
+                    {dataLoading ? (
+                      <SkeletonBox width={60} height={16} />
+                    ) : (
+                      <p style={{ color: '#ededed', fontFamily: 'Geist Mono, monospace', fontSize: 14 }}>{getPlanPrice()}/mo</p>
+                    )}
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -389,7 +548,11 @@ export default function Dashboard() {
                   <span className="mono-label">AI CORE ENGINE</span>
                 </div>
                 <h3 style={{ fontSize: 20, fontWeight: 600, color: '#ededed' }}>Gemini 1.5 Pro</h3>
-                <p style={{ color: '#666', fontSize: 12, marginTop: 8, fontFamily: 'Geist Mono, monospace' }}>Current key validation: {apiStatus.valid ? 'Success' : 'Not configured'}</p>
+                {dataLoading ? (
+                  <SkeletonBox width={140} height={14} />
+                ) : (
+                  <p style={{ color: '#666', fontSize: 12, marginTop: 8, fontFamily: 'Geist Mono, monospace' }}>Current key validation: {apiStatus.valid ? 'Success' : 'Not configured'}</p>
+                )}
               </div>
               <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -409,52 +572,8 @@ export default function Dashboard() {
                 <span className="mono-label">RECENT CONVERSATIONS</span>
                 <button style={{ fontSize: 10, fontFamily: 'Geist Mono, monospace', color: '#3ECF8E', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>VIEW ALL</button>
               </div>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', textAlign: 'left' }}>
-                  <thead style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <tr style={{ fontSize: 10, fontFamily: 'Geist Mono, monospace', color: '#666', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '12px 24px', fontWeight: 400 }}>Contact</th>
-                      <th style={{ padding: '12px 24px', fontWeight: 400 }}>Message Preview</th>
-                      <th style={{ padding: '12px 24px', fontWeight: 400 }}>Time</th>
-                      <th style={{ padding: '12px 24px', fontWeight: 400 }}>Sentiment</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <td style={{ padding: '16px 24px', fontSize: 12, fontWeight: 500, color: '#ededed' }}>+91 9988...22</td>
-                      <td style={{ padding: '16px 24px', fontSize: 12, color: '#a0a0a0', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>"Can you check my booking status for..."</td>
-                      <td style={{ padding: '16px 24px', fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#666' }}>14:22:10</td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <span style={{ padding: '4px 8px', borderRadius: 4, fontSize: 10, fontFamily: 'Geist Mono, monospace', backgroundColor: 'rgba(62,207,142,0.1)', color: '#3ECF8E', border: '1px solid rgba(62,207,142,0.1)' }}>Positive</span>
-                      </td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.2s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <td style={{ padding: '16px 24px', fontSize: 12, fontWeight: 500, color: '#ededed' }}>John Doe</td>
-                      <td style={{ padding: '16px 24px', fontSize: 12, color: '#a0a0a0', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>"I need technical assistance with the..."</td>
-                      <td style={{ padding: '16px 24px', fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#666' }}>14:18:45</td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <span style={{ padding: '4px 8px', borderRadius: 4, fontSize: 10, fontFamily: 'Geist Mono, monospace', backgroundColor: 'rgba(255,165,0,0.1)', color: 'orange', border: '1px solid rgba(255,165,0,0.1)' }}>Neutral</span>
-                      </td>
-                    </tr>
-                    <tr style={{ transition: 'background 0.2s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <td style={{ padding: '16px 24px', fontSize: 12, fontWeight: 500, color: '#ededed' }}>+1 415...99</td>
-                      <td style={{ padding: '16px 24px', fontSize: 12, color: '#a0a0a0', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>"Thank you for the quick response!"</td>
-                      <td style={{ padding: '16px 24px', fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#666' }}>14:15:02</td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <span style={{ padding: '4px 8px', borderRadius: 4, fontSize: 10, fontFamily: 'Geist Mono, monospace', backgroundColor: 'rgba(62,207,142,0.1)', color: '#3ECF8E', border: '1px solid rgba(62,207,142,0.1)' }}>Positive</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div style={{ padding: '24px', textAlign: 'center', color: '#666', fontFamily: 'Geist Mono, monospace', fontSize: 12 }}>
+                Conversations will appear here once you start chatting with your WhatsApp bot.
               </div>
             </div>
           </div>
@@ -481,23 +600,27 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="mono-label">MESSAGES TODAY:</span>
-              <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#3ECF8E' }}>{getMessagesToday().toLocaleString()}</span>
+              {dataLoading ? (
+                <SkeletonBox width={40} height={12} />
+              ) : (
+                <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#3ECF8E' }}>{messagesToday.toLocaleString()}</span>
+              )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="mono-label">ACTIVE CHATS:</span>
-              <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#ededed' }}>{userData?.whatsapp_number ? '42' : '0'}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="mono-label">AVG RESPONSE:</span>
-              <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#ededed' }}>1.4s</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="mono-label">SATISFACTION:</span>
-              <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#3ECF8E' }}>98.2%</span>
+              <span className="mono-label">CONNECTION:</span>
+              {dataLoading ? (
+                <SkeletonBox width={80} height={12} />
+              ) : (
+                <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: userData?.bot_status === 'live' ? '#3ECF8E' : '#ffb4ab' }}>{getConnectionStatus()}</span>
+              )}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="mono-label">NEXT BILLING:</span>
-              <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#ededed' }}>{getNextBilling()}</span>
+              {dataLoading ? (
+                <SkeletonBox width={80} height={12} />
+              ) : (
+                <span style={{ fontSize: 12, fontFamily: 'Geist Mono, monospace', color: '#ededed' }}>{getNextBilling()}</span>
+              )}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, color: '#666', fontSize: 10, fontFamily: 'Geist Mono, monospace' }}>
