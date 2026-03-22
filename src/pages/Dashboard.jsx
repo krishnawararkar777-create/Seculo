@@ -1,31 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Home, HelpCircle, LogOut, Power, RotateCcw, Search, Eye, EyeOff } from 'lucide-react';
-
-const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home },
-];
-
-const bottomMenuItems = [
-  { id: 'support', label: 'Support', icon: HelpCircle },
-];
-
-const mockRequests = [
-  { id: 1, request: 'Hello, how are you?', response: 'I am doing great, thank you!', time: '2 min ago' },
-  { id: 2, request: 'What is AI?', response: 'Artificial Intelligence is...', time: '15 min ago' },
-  { id: 3, request: 'Help me code', response: 'I can help you with...', time: '1 hour ago' },
-];
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('dashboard');
   const [userData, setUserData] = useState(null);
-  const [requests, setRequests] = useState([]);
-  const [showPhone, setShowPhone] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -40,7 +21,7 @@ export default function Dashboard() {
       }
       setUser(session.user);
 
-      const { data: userData, error } = await supabase
+      const { data: data, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', session.user.id)
@@ -49,8 +30,7 @@ export default function Dashboard() {
       if (error) {
         console.error('Error fetching user data:', error);
       } else {
-        setUserData(userData);
-        setRequests(mockRequests);
+        setUserData(data);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -61,7 +41,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/');
+    navigate('/login');
   };
 
   const getPlanDisplay = () => {
@@ -84,301 +64,277 @@ export default function Dashboard() {
 
   const maskPhone = (phone) => {
     if (!phone) return 'Not Set';
-    const digits = phone.replace(/\D/g, '');
-    if (digits.length <= 4) return phone;
-    const last4 = digits.slice(-4);
-    return `XXXX ${last4}`;
-  };
-
-  const maskApiKey = (key) => {
-    if (!key) return '••••••••••••••••';
-    if (key.length <= 8) return '••••••••';
-    return key.slice(0, 8) + '••••••••••••••••';
+    if (phone.length <= 7) return phone;
+    const visible = phone.slice(-7);
+    return `+91 ${visible.slice(0, 5)}-${visible.slice(5)}`;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#010409] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#21262d] border-t-[#25D366] rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#3c4a3d] border-t-[#4ff07f] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#010409] flex" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+    <div className="min-h-screen bg-[#050505] text-[#e4e1e9] font-['Inter']">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+        .glass-panel {
+          background: rgba(17, 17, 24, 0.4);
+          backdrop-filter: blur(40px);
+          border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .radial-glow {
+          background: radial-gradient(circle at center, rgba(79, 240, 127, 0.15) 0%, transparent 70%);
+        }
+        .text-glow {
+          text-shadow: 0 0 10px rgba(79, 240, 127, 0.5);
+        }
       `}</style>
 
-      <aside className="w-[200px] bg-[#000000] border-r border-[#1e1e2e] flex flex-col fixed h-full">
-        <div className="p-4 border-b border-[#1e1e2e]">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#25D366] rounded flex items-center justify-center">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span className="text-[13px] font-semibold text-white">Seculo</span>
+      {/* Side Navigation */}
+      <aside className="fixed left-0 top-0 h-full w-64 z-[60] bg-[#131318]/40 backdrop-blur-2xl border-r border-[#3c4a3d]/15 flex flex-col p-6 gap-8">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#4ff07f]/20 rounded-lg flex items-center justify-center border border-[#4ff07f]/30">
+            <span className="text-[#4ff07f] text-xl">🛡️</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-[#4ff07f] font-['Plus_Jakarta_Sans'] tracking-tighter">Seculo</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#bbcbb9] font-semibold">Enterprise AI</p>
           </div>
         </div>
 
-        <div className="flex-1 p-3">
-          <ul className="space-y-0.5">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeSection === item.id;
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setActiveSection(item.id)}
-                    className={`w-full flex items-center gap-2 px-3 h-8 rounded text-[13px] font-medium transition-colors ${
-                      isActive
-                        ? 'bg-[#1c2128] text-white border-l-[2px] border-[#25D366]'
-                        : 'text-[#ffffff] hover:text-white hover:bg-[#161b22]'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {item.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <nav className="flex flex-col gap-2">
+          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 text-[#4ff07f] bg-[#4ff07f]/10 rounded-lg font-['Plus_Jakarta_Sans'] font-semibold tracking-tight active:translate-x-1 duration-200">
+            <span className="text-xl">🏠</span>
+            <span>Dashboard</span>
+          </Link>
+          <Link to="/logs" className="flex items-center gap-3 px-4 py-3 text-[#bbcbb9] hover:bg-[#1f1f25] hover:text-[#4ff07f] transition-all font-['Plus_Jakarta_Sans'] font-semibold tracking-tight active:translate-x-1 duration-200">
+            <span className="text-xl">📋</span>
+            <span>Message Logs</span>
+          </Link>
+          <Link to="/config" className="flex items-center gap-3 px-4 py-3 text-[#bbcbb9] hover:bg-[#1f1f25] hover:text-[#4ff07f] transition-all font-['Plus_Jakarta_Sans'] font-semibold tracking-tight active:translate-x-1 duration-200">
+            <span className="text-xl">🧠</span>
+            <span>AI Config</span>
+          </Link>
+          <Link to="/settings" className="flex items-center gap-3 px-4 py-3 text-[#bbcbb9] hover:bg-[#1f1f25] hover:text-[#4ff07f] transition-all font-['Plus_Jakarta_Sans'] font-semibold tracking-tight active:translate-x-1 duration-200">
+            <span className="text-xl">⚙️</span>
+            <span>Settings</span>
+          </Link>
+        </nav>
 
-        <div className="p-3 border-t border-[#1e1e2e]">
-          <ul className="space-y-0.5">
-            {bottomMenuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setActiveSection(item.id)}
-                    className="w-full flex items-center gap-2 px-3 h-8 text-[13px] font-medium text-[#ffffff] hover:text-white hover:bg-[#161b22] rounded transition-colors"
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {item.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          
-          <div className="mt-4 pt-3 border-t border-[#1e1e2e]">
-            <p className="text-[11px] text-[#ffffff] px-3 mb-2 truncate">{user?.email}</p>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-3 h-8 text-[13px] font-medium text-[#ffffff] hover:text-white hover:bg-[#161b22] rounded transition-colors"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              Logout
-            </button>
-          </div>
+        <div className="mt-auto">
+          <button 
+            onClick={handleLogout}
+            className="w-full bg-[#4ff07f] text-[#003915] font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity font-['Plus_Jakarta_Sans']"
+          >
+            <span className="text-xl">🚪</span>
+            Logout
+          </button>
         </div>
       </aside>
 
-      <div className="flex-1 ml-[200px] flex flex-col min-h-screen">
-        <div className="h-10 bg-[#000000] border-b border-[#1e1e2e] flex items-center px-4">
-          <div className="flex items-center gap-2 flex-1 bg-[#010409] border border-[#1e1e2e] rounded px-2 h-6">
-            <Search className="w-3 h-3 text-[#ffffff]" />
-            <input
+      {/* Top Navigation */}
+      <header className="fixed top-0 left-64 right-0 h-20 z-50 bg-[#131318]/80 backdrop-blur-xl border-b border-[#3c4a3d]/15 flex justify-between items-center px-8">
+        <div className="flex items-center flex-1 max-w-md">
+          <div className="w-full bg-[#1b1b20] rounded-full px-4 py-2 flex items-center gap-3 border border-[#3c4a3d]/15">
+            <span className="text-[#bbcbb9] text-sm">🔍</span>
+            <input 
+              className="bg-transparent border-none text-sm w-full focus:ring-0 text-[#e4e1e9]" 
+              placeholder="Search system logs..." 
               type="text"
-              placeholder="Search..."
-              className="flex-1 bg-transparent text-[12px] text-[#e6edf3] placeholder-[#8b949e] outline-none"
             />
           </div>
         </div>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <button className="p-2 text-[#bbcbb9] hover:text-[#4ff07f] transition-colors">
+              <span className="text-xl">🔔</span>
+            </button>
+            <button className="p-2 text-[#bbcbb9] hover:text-[#4ff07f] transition-colors">
+              <span className="text-xl">⚡</span>
+            </button>
+          </div>
+          <div className="h-8 w-[1px] bg-[#3c4a3d]/30"></div>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-sm font-bold text-[#e4e1e9]">{user?.email?.split('@')[0] || 'User'}</p>
+              <p className="text-[10px] text-[#4ff07f] uppercase tracking-widest">{getPlanDisplay()} Tier</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-[#4ff07f]/20 border border-[#4ff07f]/30 flex items-center justify-center">
+              <span className="text-[#4ff07f] font-bold text-sm">{user?.email?.[0]?.toUpperCase() || 'U'}</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <main className="flex-1 p-4">
-          <div className="mb-4">
-            <h1 className="text-[16px] font-semibold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Dashboard</h1>
+      {/* Main Content */}
+      <main className="ml-64 mt-20 p-8 min-h-screen relative">
+        {/* Ambient Background Glows */}
+        <div className="fixed top-1/4 left-1/3 w-[500px] h-[500px] radial-glow opacity-30 -z-10 pointer-events-none"></div>
+        <div className="fixed bottom-1/4 right-1/4 w-[600px] h-[600px] radial-glow opacity-20 -z-10 pointer-events-none"></div>
+
+        {/* Bot Status Bar */}
+        <div className="flex justify-center mb-10">
+          <div className="glass-panel px-8 py-3 rounded-full flex items-center gap-4 shadow-xl border-[#4ff07f]/20">
+            <div className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ff07f] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#4ff07f]"></span>
+            </div>
+            <span className="font-['Plus_Jakarta_Sans'] font-extrabold tracking-[0.15em] text-[#4ff07f] text-sm">
+              BOT STATUS: {userData?.bot_status === 'live' ? 'LIVE' : 'OFFLINE'}
+            </span>
+          </div>
+        </div>
+
+        {/* Grid Layout */}
+        <div className="grid grid-cols-12 gap-8">
+          {/* Central QR Code Section */}
+          <div className="col-span-12 lg:col-span-7 row-span-2">
+            <div className="glass-panel h-full rounded-[2rem] p-12 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-b from-[#4ff07f]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+              <div className="relative z-10 mb-8 p-6 bg-white rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                <img 
+                  alt="WhatsApp Activation QR Code" 
+                  className="w-48 h-48" 
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://seculo.app/activate" 
+                />
+              </div>
+              <h2 className="text-3xl font-['Plus_Jakarta_Sans'] font-extrabold text-[#e4e1e9] mb-4 tracking-tight">Activate Seculo AI</h2>
+              <p className="text-[#bbcbb9] max-w-md mb-8 leading-relaxed">
+                Scan this code with your WhatsApp app to activate the <span className="text-[#4ff07f] font-bold">Seculo AI engine</span>. Initializing will sync your logs and knowledge base.
+              </p>
+              <div className="flex gap-4">
+                <button className="px-8 py-4 bg-[#4ff07f] text-[#003915] font-bold rounded-xl text-lg flex items-center gap-3 shadow-[0_10px_30px_rgba(79,240,127,0.3)] hover:scale-105 transition-transform font-['Plus_Jakarta_Sans']">
+                  <span className="text-xl">📷</span>
+                  Scan QR
+                </button>
+                <button className="px-8 py-4 border border-[#3c4a3d]/30 text-[#e4e1e9] font-bold rounded-xl text-lg hover:bg-white/5 transition-colors font-['Plus_Jakarta_Sans']">
+                  Help Center
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Top Stats Row */}
-          <div className="mb-4">
-            <div className="flex items-stretch">
-              <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Bot Status</p>
-                <div className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.bot_status === 'live' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
-                  <span className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-                    {userData?.bot_status === 'live' ? 'LIVE' : 'OFFLINE'}
-                  </span>
+          {/* WhatsApp Connection Status */}
+          <div className="col-span-12 lg:col-span-5">
+            <div className="glass-panel rounded-[2rem] p-8 flex items-center justify-between group hover:border-[#4ff07f]/40 transition-colors">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 rounded-2xl bg-[#25d366]/10 flex items-center justify-center border border-[#25d366]/20">
+                  <span className="text-[#25d366] text-3xl">💬</span>
                 </div>
-              </div>
-              <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Messages Today</p>
-                <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-                  {userData?.messages_today || 0}
-                </p>
-              </div>
-              <div className="flex-1 px-4 py-2 flex flex-col justify-center border-r border-[#1e1e2e]">
-                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Plan</p>
-                <p className="text-[18px] font-bold text-[#e6edf3] capitalize" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-                  {getPlanDisplay()} {getPlanPrice()}
-                </p>
-              </div>
-              <div className="flex-1 px-4 py-2 flex flex-col justify-center">
-                <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">WhatsApp</p>
-                <p className="text-[18px] font-bold text-[#e6edf3]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>
-                  {maskPhone(userData?.whatsapp_number)}
-                </p>
-              </div>
-            </div>
-            <div className="border-b border-[#1e1e2e]"></div>
-          </div>
-
-          {/* Bot Status Section */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <span className={`w-1.5 h-1.5 rounded-full ${userData?.bot_status === 'live' ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
-                <span className={`text-[13px] font-medium ${userData?.bot_status === 'live' ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
-                  {userData?.bot_status === 'live' ? 'LIVE' : 'OFFLINE'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-2.5 h-7 bg-[#25D366] hover:bg-[#1fa855] text-white text-[12px] font-medium rounded transition-colors">
-                  <RotateCcw className="w-3 h-3" />
-                  Restart Bot
-                </button>
-                <button className="flex items-center gap-1.5 px-2.5 h-7 border border-[#f85149]/50 hover:bg-[#f85149]/10 text-[#f85149] text-[12px] font-medium rounded transition-colors">
-                  <Power className="w-3 h-3" />
-                  Stop Bot
-                </button>
-              </div>
-            </div>
-            <div className="border-b border-[#1e1e2e]"></div>
-          </div>
-
-          {/* Recent Activity Section */}
-          <div className="mb-6">
-            <h2 className="text-[13px] font-semibold text-[#e6edf3] uppercase mb-2" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>Recent Activity</h2>
-            {requests.length > 0 ? (
-              <div>
-                {requests.map((req, idx) => (
-                  <div 
-                    key={req.id} 
-                    className="py-2.5 border-b border-[#1e1e2e] last:border-b-0 hover:bg-[#0d0d18] transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 bg-[#25D366] rounded-full" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-[#e6edf3]">{req.request}</p>
-                        <p className="text-[12px] text-[#ffffff]">{req.response}</p>
-                      </div>
-                      <span className="text-[11px] text-[#ffffff]">{req.time}</span>
-                    </div>
+                <div>
+                  <h3 className="font-['Plus_Jakarta_Sans'] text-lg font-bold text-[#e4e1e9]">WhatsApp Connection</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[#4ff07f] font-bold">Connected</span>
+                    <span className="text-[#4ff07f] text-sm">✅</span>
+                    <span className="text-[#bbcbb9] text-sm ml-2">
+                      {userData?.whatsapp_number ? maskPhone(userData.whatsapp_number) : 'Not configured'}
+                    </span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[13px] text-[#ffffff] italic text-center py-4">No requests yet — start chatting with your bot on WhatsApp!</p>
-            )}
-            <div className="border-b border-[#1e1e2e]"></div>
-          </div>
-
-          {/* Phone Number Section */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-4">
-                <div>
-                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Phone Number</p>
-                  {userData?.whatsapp_number ? (
-                    <p className="text-[13px] font-medium text-[#e6edf3]">
-                      {showPhone ? userData.whatsapp_number : maskPhone(userData.whatsapp_number)}
-                    </p>
-                  ) : (
-                    <p className="text-[13px] font-medium text-[#ffffff]">Not configured</p>
-                  )}
-                </div>
-                {userData?.whatsapp_number && (
-                  <button
-                    onClick={() => setShowPhone(!showPhone)}
-                    className="p-1.5 hover:bg-[#0d0d18] rounded transition-colors"
-                  >
-                    {showPhone ? <EyeOff className="w-4 h-4 text-[#ffffff]" /> : <Eye className="w-4 h-4 text-[#ffffff]" />}
-                  </button>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.whatsapp_number ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
-                  <span className={`text-[12px] ${userData?.whatsapp_number ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
-                    {userData?.whatsapp_number ? 'Connected' : 'Not connected'}
-                  </span>
-                </span>
-                <button className="px-2.5 h-7 bg-[#25D366] hover:bg-[#1fa855] text-white text-[12px] font-medium rounded transition-colors">
-                  Edit
-                </button>
-              </div>
-            </div>
-            <div className="border-b border-[#1e1e2e]"></div>
-          </div>
-
-          {/* API Key Section */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-4">
-                <div>
-                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">API Key</p>
-                  {userData?.gemini_api_key ? (
-                    <p className="text-[13px] text-[#e6edf3] font-mono">
-                      {showApiKey ? userData.gemini_api_key : maskApiKey(userData.gemini_api_key)}
-                    </p>
-                  ) : (
-                    <p className="text-[13px] font-medium text-[#ffffff]">Not configured</p>
-                  )}
-                </div>
-                {userData?.gemini_api_key && (
-                  <button
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="p-1.5 hover:bg-[#0d0d18] rounded transition-colors"
-                  >
-                    {showApiKey ? <EyeOff className="w-4 h-4 text-[#ffffff]" /> : <Eye className="w-4 h-4 text-[#ffffff]" />}
-                  </button>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${userData?.gemini_api_key ? 'bg-[#3fb950]' : 'bg-[#f85149]'}`} />
-                  <span className={`text-[12px] ${userData?.gemini_api_key ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
-                    {userData?.gemini_api_key ? 'Active' : 'Not configured'}
-                  </span>
-                </span>
-                <button className={`px-2.5 h-7 text-[12px] font-medium rounded transition-colors ${userData?.gemini_api_key ? 'border border-[#1e1e2e] hover:bg-[#0d0d18] text-[#ffffff]' : 'bg-[#25D366] hover:bg-[#1fa855] text-white'}`}>
-                  {userData?.gemini_api_key ? 'Edit' : 'Add'}
-                </button>
-              </div>
-            </div>
-            <div className="border-b border-[#1e1e2e]"></div>
-          </div>
-
-          {/* Billing Section */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-8">
-                <div>
-                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Current Plan</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanDisplay()}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Price</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getPlanPrice()}<span className="text-[#ffffff] font-normal">/month</span></p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-medium text-[#ffffff] uppercase mb-0.5">Next Billing</p>
-                  <p className="text-[13px] font-semibold text-[#e6edf3]">{getNextBilling()}</p>
                 </div>
               </div>
-              <button className="px-2.5 h-7 bg-[#25D366] hover:bg-[#1fa855] text-white text-[12px] font-medium rounded transition-colors">
-                Upgrade Plan
+              <button className="text-[#bbcbb9] hover:text-[#ffb4ab] transition-colors p-2">
+                <span className="text-xl">🚪</span>
               </button>
             </div>
-            <div className="border-b border-[#1e1e2e]"></div>
           </div>
-        </main>
-      </div>
+
+          {/* Gemini API Status */}
+          <div className="col-span-12 lg:col-span-5">
+            <div className="glass-panel rounded-[2rem] p-8 group hover:border-[#4ff07f]/40 transition-colors">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-[#acc7ff]/10 flex items-center justify-center border border-[#acc7ff]/20">
+                    <span className="text-[#acc7ff] text-3xl">✨</span>
+                  </div>
+                  <div>
+                    <h3 className="font-['Plus_Jakarta_Sans'] text-lg font-bold text-[#e4e1e9]">Gemini API Status</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      {userData?.gemini_api_key ? (
+                        <>
+                          <span className="inline-block w-2 h-2 rounded-full bg-[#4ff07f] animate-pulse"></span>
+                          <span className="text-[#4ff07f] text-sm font-bold uppercase tracking-widest">Valid & Active</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="inline-block w-2 h-2 rounded-full bg-[#ffb4ab]"></span>
+                          <span className="text-[#ffb4ab] text-sm font-bold uppercase tracking-widest">Not Configured</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button className="flex-1 py-3 bg-[#2a292f] hover:bg-[#35343a] text-[#e4e1e9] text-sm font-bold rounded-xl border border-[#3c4a3d]/10 transition-all font-['Plus_Jakarta_Sans']">
+                  Test Endpoint
+                </button>
+                <button className="flex-1 py-3 bg-[#4ff07f]/10 hover:bg-[#4ff07f]/20 text-[#4ff07f] text-sm font-bold rounded-xl border border-[#4ff07f]/20 transition-all flex items-center justify-center gap-2 font-['Plus_Jakarta_Sans']">
+                  <span className="text-sm">🔄</span>
+                  Rotate API Key
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Plan Detail Card */}
+          <div className="col-span-12">
+            <div className="glass-panel rounded-[2rem] p-8 overflow-hidden relative">
+              <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#4ff07f]/5 rounded-full blur-[100px]"></div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-center relative z-10">
+                <div>
+                  <p className="text-[#bbcbb9] text-[10px] uppercase tracking-[0.2em] font-bold mb-1">Current Plan</p>
+                  <h4 className="text-3xl font-['Plus_Jakarta_Sans'] font-extrabold text-[#e4e1e9]">
+                    {getPlanDisplay()} <span className="text-sm font-medium text-[#4ff07f] ml-2">{getPlanPrice()}/mo</span>
+                  </h4>
+                </div>
+                <div>
+                  <p className="text-[#bbcbb9] text-[10px] uppercase tracking-[0.2em] font-bold mb-1">Usage Limit</p>
+                  <div className="flex items-end gap-2 mb-2">
+                    <h4 className="text-2xl font-['Plus_Jakarta_Sans'] font-extrabold text-[#e4e1e9]">84%</h4>
+                    <span className="text-[#bbcbb9] text-sm mb-1">/ UNLIMITED</span>
+                  </div>
+                  <div className="w-full h-2 bg-[#35343a] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#4ff07f] shadow-[0_0_10px_rgba(79,240,127,0.5)]" style={{ width: '84%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[#bbcbb9] text-[10px] uppercase tracking-[0.2em] font-bold mb-1">Next Billing</p>
+                  <h4 className="text-xl font-['Plus_Jakarta_Sans'] font-bold text-[#e4e1e9]">{getNextBilling()}</h4>
+                  <p className="text-[10px] text-[#bbcbb9]">Auto-renew active</p>
+                </div>
+                <div className="flex justify-end">
+                  <button className="px-10 py-4 bg-[#4ff07f] text-[#003915] font-bold rounded-xl hover:shadow-[0_0_20px_rgba(79,240,127,0.4)] transition-all font-['Plus_Jakarta_Sans']">
+                    Manage Plan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer System Status */}
+        <footer className="mt-12 flex justify-between items-center text-[#bbcbb9] text-xs">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4ff07f]"></span>
+              <span>Database: Latency 14ms</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4ff07f]"></span>
+              <span>Auth: Synced</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#acc7ff]"></span>
+              <span>v2.4.0-seculo</span>
+            </div>
+          </div>
+          <p>© 2024 Seculo AI Enterprise. All rights secured.</p>
+        </footer>
+      </main>
     </div>
   );
 }
