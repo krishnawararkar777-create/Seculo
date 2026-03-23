@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import BotCard from '../components/BotCard';
@@ -17,6 +17,9 @@ export default function Dashboard() {
   const [restarting, setRestarting] = useState(false);
   const [restartMsg, setRestartMsg] = useState('');
   const [error, setError] = useState('');
+  const [localBotStatus, setLocalBotStatus] = useState('not_started');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const pollingRef = useRef(null);
 
   useEffect(() => {
     fetchAllData();
@@ -103,6 +106,28 @@ export default function Dashboard() {
       } catch (e) {
         console.log('Messages table not available');
       }
+
+      try {
+        const { data: { session: sess } } = await supabase.auth.getSession();
+        const { status } = await fetch(`${API_BASE_URL}/bot/status`, {
+          headers: { Authorization: `Bearer ${sess?.access_token}` },
+        }).then(r => r.json());
+        setLocalBotStatus(status || 'not_started');
+        if (status === 'starting' || status === 'running') {
+          pollingRef.current = setInterval(async () => {
+            const { status: s } = await fetch(`${API_BASE_URL}/bot/status`, {
+              headers: { Authorization: `Bearer ${sess?.access_token}` },
+            }).then(r => r.json());
+            setLocalBotStatus(s);
+            if (s === 'running') {
+              clearInterval(pollingRef.current);
+              pollingRef.current = null;
+            }
+          }, 5000);
+        }
+      } catch (e) {
+        console.log('Bot status check failed');
+      }
     } catch (err) {
       console.error('Error:', err);
       setError('Could not load data. Please refresh.');
@@ -115,6 +140,32 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
+  };
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`${API_BASE_URL}/bot/download-installer`, {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'seculo-setup.bat';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        alert('Download failed. Please try again.');
+      }
+    } catch (err) {
+      alert('Download failed. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleRestart = async () => {
@@ -248,6 +299,8 @@ export default function Dashboard() {
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
         .scan-line { height: 2px; background: #3ECF8E; width: 100%; position: absolute; top: 0; left: 0; box-shadow: 0 0 8px #3ECF8E; animation: scan 3s ease-in-out infinite; }
         @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
       `}</style>
 
       {/* Side Navigation Bar */}
@@ -563,6 +616,129 @@ export default function Dashboard() {
                 Conversations will appear here once you start chatting with your WhatsApp bot.
               </div>
             </div>
+          </div>
+
+          {/* Bot Management */}
+          <div style={{ backgroundColor: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: '#ededed', marginBottom: 20, fontFamily: 'Geist, sans-serif' }}>Your AI Assistant</h3>
+
+            {/* Steps */}
+            <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#3ECF8E', color: '#003822', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>1</div>
+                <span style={{ fontSize: 12, color: '#a0a0a0', fontFamily: 'Geist Mono, monospace' }}>Download Installer</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#3ECF8E', color: '#003822', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>2</div>
+                <span style={{ fontSize: 12, color: '#a0a0a0', fontFamily: 'Geist Mono, monospace' }}>Double-click the file</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#3ECF8E', color: '#003822', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>3</div>
+                <span style={{ fontSize: 12, color: '#a0a0a0', fontFamily: 'Geist Mono, monospace' }}>Scan WhatsApp QR</span>
+              </div>
+            </div>
+
+            {/* Status */}
+            {localBotStatus === 'not_started' && (
+              <div style={{ textAlign: 'center' }}>
+                <button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  style={{
+                    padding: '14px 40px',
+                    backgroundColor: '#3ECF8E',
+                    color: '#003822',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    borderRadius: 6,
+                    border: 'none',
+                    cursor: isDownloading ? 'not-allowed' : 'pointer',
+                    opacity: isDownloading ? 0.6 : 1,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontFamily: 'Geist, sans-serif',
+                  }}
+                >
+                  {isDownloading ? (
+                    <>
+                      <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⟳</span>
+                      Downloading...
+                    </>
+                  ) : (
+                    <>
+                      <span>⬇️</span>
+                      Download My Assistant
+                    </>
+                  )}
+                </button>
+                <p style={{ fontSize: 11, color: '#666', fontFamily: 'Geist Mono, monospace', marginTop: 12 }}>Free 7-day trial included</p>
+              </div>
+            )}
+
+            {localBotStatus === 'starting' && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ffb956', animation: 'pulse 1.5s infinite' }}></div>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#ffb956', fontFamily: 'Geist, sans-serif' }}>Installing on your computer...</span>
+                </div>
+                <p style={{ fontSize: 11, color: '#666', fontFamily: 'Geist Mono, monospace' }}>This takes 2-3 minutes</p>
+              </div>
+            )}
+
+            {localBotStatus === 'running' && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#3ECF8E', animation: 'ping 1.5s infinite', opacity: 0.6 }}></span>
+                    <span style={{ position: 'relative', display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#3ECF8E' }}></span>
+                  </div>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#3ECF8E', fontFamily: 'Geist, sans-serif' }}>Your AI Assistant is LIVE ✅</span>
+                </div>
+                <p style={{ fontSize: 11, color: '#a0a0a0', fontFamily: 'Geist Mono, monospace' }}>Keep your computer on to stay connected</p>
+                <p style={{ fontSize: 10, color: '#666', fontFamily: 'Geist Mono, monospace', marginTop: 4 }}>Message your WhatsApp number to talk to your assistant</p>
+              </div>
+            )}
+
+            {localBotStatus === 'stopped' && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ffb4ab' }}></div>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#ffb4ab', fontFamily: 'Geist, sans-serif' }}>Assistant is offline</span>
+                </div>
+                <button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  style={{
+                    padding: '12px 32px',
+                    backgroundColor: '#3ECF8E',
+                    color: '#003822',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    borderRadius: 6,
+                    border: 'none',
+                    cursor: isDownloading ? 'not-allowed' : 'pointer',
+                    opacity: isDownloading ? 0.6 : 1,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontFamily: 'Geist, sans-serif',
+                  }}
+                >
+                  {isDownloading ? (
+                    <>
+                      <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⟳</span>
+                      Downloading...
+                    </>
+                  ) : (
+                    <>
+                      <span>⬇️</span>
+                      Reinstall
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}
