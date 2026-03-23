@@ -96,15 +96,45 @@ app.get('/api/license/check', async (req, res) => {
 });
 app.get('/api/bot/download-installer', async (req, res) => {
   try {
+    const authHeader = req.headers['authorization'];
+    let userId = 'anonymous';
+    let geminiKey = '';
+    let licenseKey = '';
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.decode(token);
+      userId = decoded?.sub || decoded?.id || 'anonymous';
+    }
+
+    if (userId !== 'anonymous') {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('ai_api_key, license_key')
+        .eq('id', userId)
+        .single();
+
+      if (!profile) {
+        return res.status(400).json({ 
+          error: 'Please complete onboarding first and add your Gemini API key' 
+        });
+      }
+
+      geminiKey = profile.ai_api_key || '';
+      licenseKey = profile.license_key || '';
+    }
+
     const installerPath = path.join(__dirname, '..', 'installer', 'setup.bat');
     if (!fs.existsSync(installerPath)) {
       return res.status(404).json({ error: 'Installer not found' });
     }
+
     let content = fs.readFileSync(installerPath, 'utf8');
-    content = content.replace(/%%USER_ID%%/g, 'test-user');
-    content = content.replace(/%%LICENSE_KEY%%/g, 'test-license');
-    content = content.replace(/%%GEMINI_KEY%%/g, 'test-key');
+    content = content.replace(/%%USER_ID%%/g, userId);
+    content = content.replace(/%%LICENSE_KEY%%/g, licenseKey);
+    content = content.replace(/%%GEMINI_KEY%%/g, geminiKey);
     content = content.replace(/%%BACKEND_URL%%/g, process.env.BACKEND_URL || 'https://your-backend.onrender.com');
+
     res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', 'attachment; filename=seculo-setup.bat');
     res.send(content);
