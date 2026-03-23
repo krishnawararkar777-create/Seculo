@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import BotCard from '../components/BotCard';
 
 const API_BASE_URL = 'https://seculo-2.onrender.com/api';
 
@@ -487,23 +488,9 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* QR Scanner */}
+            {/* Bot Control */}
             <div style={{ gridColumn: 'span 12 / span 5', display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div style={{ backgroundColor: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 24, display: 'flex', gap: 24 }}>
-                <div style={{ position: 'relative', width: 120, height: 120, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://seculo.app/activate" alt="QR Code" style={{ width: 100, height: 100 }} />
-                  <div className="scan-line"></div>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <span className="mono-label">QR LINK PAIRING</span>
-                  <ul style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 11, color: '#a0a0a0', fontFamily: 'Geist Mono, monospace', listStyle: 'none', padding: 0 }}>
-                    <li style={{ display: 'flex', gap: 8 }}><span>1.</span> Open WhatsApp on phone</li>
-                    <li style={{ display: 'flex', gap: 8 }}><span>2.</span> Tap Settings &gt; Linked Devices</li>
-                    <li style={{ display: 'flex', gap: 8 }}><span>3.</span> Point camera at this screen</li>
-                    <li style={{ display: 'flex', gap: 8, color: '#3ECF8E' }}><span>4.</span> Wait for session sync</li>
-                  </ul>
-                </div>
-              </div>
+              <BotCard />
 
               {/* Plan Details */}
               <div style={{ backgroundColor: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: 24 }}>
