@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { onboard } from './routes/onboard.js';
 import { createBot, stopBotRoute, startBotRoute, deleteBotRoute } from './routes/bot.js';
 import { getDashboard } from './routes/dashboard.js';
-import { checkLicense, localStarted, downloadInstaller, getBotStatus } from './routes/license.js';
+import { localStarted, downloadInstaller, getBotStatus } from './routes/license.js';
 
 dotenv.config();
 
@@ -53,7 +53,41 @@ app.post('/api/bot/start', startBotRoute);
 app.post('/api/bot/delete', deleteBotRoute);
 app.get('/api/dashboard/:user_id', getDashboard);
 
-app.get('/api/license/check', checkLicense);
+app.get('/api/license/check', async (req, res) => {
+  try {
+    const { userId, licenseKey } = req.query;
+
+    if (!userId || !licenseKey) {
+      return res.status(400).json({ valid: false, reason: 'Missing userId or licenseKey' });
+    }
+
+    const { data: user, error } = await supabaseAdmin
+      .from('profiles')
+      .select('subscription_status, subscription_end_date')
+      .eq('id', userId)
+      .eq('license_key', licenseKey)
+      .single();
+
+    if (error || !user) {
+      return res.json({ valid: false, reason: 'Invalid license' });
+    }
+
+    if (user.subscription_status === 'cancelled') {
+      return res.json({ valid: false, reason: 'Subscription cancelled. Renew at seculo.app' });
+    }
+
+    const now = new Date();
+    const endDate = new Date(user.subscription_end_date);
+    if (endDate < now) {
+      return res.json({ valid: false, reason: 'Subscription expired. Renew at seculo.app' });
+    }
+
+    res.json({ valid: true, expiresAt: user.subscription_end_date });
+  } catch (err) {
+    console.error('[/license/check] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.post('/api/bot/local-started', localStarted);
 app.get('/api/bot/download-installer', authMiddleware, downloadInstaller);
 app.get('/api/bot/status', authMiddleware, getBotStatus);
