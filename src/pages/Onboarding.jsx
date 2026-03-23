@@ -286,6 +286,8 @@ export default function Onboarding() {
         navigate('/login');
         return;
       }
+      const userId = session?.user?.id;
+      const userEmail = session?.user?.email;
       const response = await fetch(`${API_BASE_URL}/onboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -293,6 +295,8 @@ export default function Onboarding() {
           whatsapp_number: `${selectedCountry.dial}${formData.whatsapp_number}`,
           gemini_api_key: formData.gemini_api_key,
           plan: selectedPlan,
+          user_id: userId,
+          email: userEmail,
         }),
       });
       const result = await response.json();
