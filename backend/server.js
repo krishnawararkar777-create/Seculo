@@ -2,10 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { onboard } from './routes/onboard.js';
 import { createBot, stopBotRoute, startBotRoute, deleteBotRoute } from './routes/bot.js';
 import { getDashboard } from './routes/dashboard.js';
-import { localStarted, downloadInstaller, getBotStatus } from './routes/license.js';
+import { supabaseAdmin } from './services/supabase.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -88,9 +94,59 @@ app.get('/api/license/check', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.post('/api/bot/local-started', localStarted);
-app.get('/api/bot/download-installer', authMiddleware, downloadInstaller);
-app.get('/api/bot/status', authMiddleware, getBotStatus);
+app.get('/api/bot/download-installer', async (req, res) => {
+  try {
+    const installerPath = path.join(__dirname, '..', 'installer', 'setup.bat');
+    if (!fs.existsSync(installerPath)) {
+      return res.status(404).json({ error: 'Installer not found' });
+    }
+    let content = fs.readFileSync(installerPath, 'utf8');
+    content = content.replace(/%%USER_ID%%/g, 'test-user');
+    content = content.replace(/%%LICENSE_KEY%%/g, 'test-license');
+    content = content.replace(/%%GEMINI_KEY%%/g, 'test-key');
+    content = content.replace(/%%BACKEND_URL%%/g, process.env.BACKEND_URL || 'https://your-backend.onrender.com');
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', 'attachment; filename=seculo-setup.bat');
+    res.send(content);
+  } catch (err) {
+    console.error('[/bot/download-installer] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/bot/local-started', async (req, res) => {
+  try {
+    const { userId, status } = req.body;
+    if (!userId || !status) {
+      return res.status(400).json({ success: false, error: 'Missing userId or status' });
+    }
+    await supabaseAdmin
+      .from('bots')
+      .upsert({ user_id: userId, status, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[/bot/local-started] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/bot/status', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.json({ status: 'not_started' });
+    }
+    const { data: bot } = await supabaseAdmin
+      .from('bots')
+      .select('status')
+      .eq('user_id', userId)
+      .single();
+    res.json({ status: bot?.status || 'not_started' });
+  } catch (err) {
+    console.error('[/bot/status] Error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
