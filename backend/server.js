@@ -125,6 +125,7 @@ app.get('/api/bot/download-installer', async (req, res) => {
     }
 
     const installerPath = path.join(__dirname, '..', 'installer', 'seculo-install.ps1');
+    console.log('Looking for installer at:', installerPath);
     if (!fs.existsSync(installerPath)) {
       return res.status(404).json({ error: 'Installer not found' });
     }
