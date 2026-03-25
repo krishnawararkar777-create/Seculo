@@ -154,7 +154,7 @@ export default function Dashboard() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'seculo-setup.bat';
+        a.download = 'SeculoSetup.ps1';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
