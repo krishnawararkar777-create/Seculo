@@ -124,7 +124,7 @@ app.get('/api/bot/download-installer', async (req, res) => {
       licenseKey = profile.license_key || '';
     }
 
-    const installerPath = path.join(__dirname, '..', 'installer', 'setup.bat');
+    const installerPath = path.join(__dirname, '..', 'installer', 'seculo-install.ps1');
     if (!fs.existsSync(installerPath)) {
       return res.status(404).json({ error: 'Installer not found' });
     }
@@ -136,7 +136,7 @@ app.get('/api/bot/download-installer', async (req, res) => {
     content = content.replace(/%%BACKEND_URL%%/g, process.env.BACKEND_URL || 'https://your-backend.onrender.com');
 
     res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', 'attachment; filename=seculo-setup.bat');
+    res.setHeader('Content-Disposition', 'attachment; filename=SeculoSetup.ps1');
     res.send(content);
   } catch (err) {
     console.error('[/bot/download-installer] Error:', err.message);
