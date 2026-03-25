@@ -122,6 +122,12 @@ app.get('/api/bot/download-installer', async (req, res) => {
 
       geminiKey = profile.ai_api_key || '';
       licenseKey = profile.license_key || '';
+
+      console.log('Profile data:', { 
+        hasApiKey: !!geminiKey, 
+        hasLicense: !!licenseKey,
+        userId 
+      });
     }
 
     const installerPath = path.join(__dirname, '..', 'installer', 'seculo-install.ps1');
