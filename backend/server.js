@@ -137,6 +137,8 @@ app.get('/api/bot/download-installer', async (req, res) => {
     }
 
     let content = fs.readFileSync(installerPath, 'utf8');
+    console.log('geminiKey length:', geminiKey.length);
+    console.log('has placeholder:', content.includes('%%GEMINI_KEY%%'));
     content = content.replace(/%%USER_ID%%/g, userId);
     content = content.replace(/%%LICENSE_KEY%%/g, licenseKey);
     content = content.replace(/%%GEMINI_KEY%%/g, geminiKey);
