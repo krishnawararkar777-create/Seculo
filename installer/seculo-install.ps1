@@ -1,3 +1,4 @@
+Set-ExecutionPolicy Bypass -Scope Process -Force
 # Seculo AI Assistant Installer
 # Run as Administrator
 
