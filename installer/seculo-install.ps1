@@ -134,7 +134,7 @@ Set-Location $installDir
 echo $geminiKey | & openclaw models set google/gemini-2.0-flash 2>$null
 
 # Add to startup
-$startCmd = "cmd /c "cd /d $installDir && openclaw gateway --port 18789""
+$startCmd = "cmd /c cd /d "$installDir" && openclaw gateway --port 18789"
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "SeculoAI" -Value $startCmd -ErrorAction SilentlyContinue
 
 # Notify dashboard
